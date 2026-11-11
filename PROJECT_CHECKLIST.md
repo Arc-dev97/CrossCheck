@@ -169,3 +169,9 @@ Live test note: both app demo jobs are paused. ChatGPT confirmed the native task
 - [ ] Automatic ChatGPT event-generated messages remain unverified; this upgrade does not claim a fix.
 
 - [x] Actual ChatGPT read-only cross-codebase investigation verified with real source tables, run history and GitHub commits. This is on-demand diagnosis, not automatic notification verification.
+
+## Saved-run navigation fix
+- [x] Open this run now awaits the shared loader, brings results into view and focuses the report heading.
+- [x] Show opening/error feedback beside notifications.
+- [x] Preserve selected completed run during background list refreshes.
+- [x] JavaScript syntax checks and actual browser verification with saved database runs.
