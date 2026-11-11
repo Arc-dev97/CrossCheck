@@ -259,24 +259,24 @@
       <label>
        Saved recipes
        <select id="savedRecipes">
-        <option value="demo">
-         Inventory demo recipe
+        <option value="">
+         Custom rules / choose a recipe to apply
         </option>
        </select>
       </label>
-      <button class="secondary" id="loadSaved">
-       Load selected recipe
+      <button class="secondary" disabled="" id="loadSaved">
+       Reapply recipe
       </button>
       <input aria-label="Recipe name" id="recipeName" placeholder="Name your recipe"/>
       <button class="secondary" id="save">
        Save recipe
       </button>
       <span class="muted" id="recipeStatus" role="status">
-       No recipe saved yet
+       Custom rules · not saved
       </span>
      </div>
      <p class="muted">
-      Save a reusable recipe, or load one compatible with your selected sources.
+      Selecting a recipe applies its rules immediately. Check the matching keys and comparison types before previewing.
      </p>
      <div class="grid">
       <div>

@@ -188,3 +188,10 @@ Live test note: both app demo jobs are paused. ChatGPT confirmed the native task
 - [x] Current temporary demo updated; source published. Existing user records not cleared.
 
 Validation limits: browser download-event automation timed out (export endpoint tests pass); independent GPT GitHub connector and automatic assistant push responses are not claimed as verified in this pass.
+
+## Recipe selection clarity fix
+- [x] Selecting a saved recipe applies its mappings, comparison types and tolerances immediately.
+- [x] Show an explicit Active recipe status and populated recipe name; use an empty/custom placeholder before selection.
+- [x] Manual rule edits clear saved selection and invalidate preview approval.
+- [x] Incompatible recipes leave existing rules unchanged and show Recipe not applied.
+- [x] Browser verified with actual employee-audit snapshots: correct business keys, Number comparison, 71 matches / 12 mismatches; edited rules and incompatible recipe states verified. JavaScript syntax checks pass; no backend changes.
