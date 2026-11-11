@@ -175,3 +175,16 @@ Live test note: both app demo jobs are paused. ChatGPT confirmed the native task
 - [x] Show opening/error feedback beside notifications.
 - [x] Preserve selected completed run during background list refreshes.
 - [x] JavaScript syntax checks and actual browser verification with saved database runs.
+
+## CrossCheck UI/UX redesign
+- [x] Volopay-inspired purple, dark headings, local licensed Bricolage font and CrossCheck app/login identity.
+- [x] Five accessible responsive tabs; unsaved work survives navigation.
+- [x] GitHub setup panel and job repository selectors removed without changing existing MCP contracts.
+- [x] CSV/live-source selection, rules, preview and execution grouped into clear steps.
+- [x] Separate schedule editor and readable immutable history reports.
+- [x] Human-readable notification summaries, pagination and working related-report navigation.
+- [x] Owner-scoped transactional demo reset with review counts and recoverable Undo; source tables and configuration retained; restored jobs paused.
+- [x] 43 tests; browser QA including reset/undo, draft link and mobile keyboard navigation; real Supabase preview; public MCP smoke check.
+- [x] Current temporary demo updated; source published. Existing user records not cleared.
+
+Validation limits: browser download-event automation timed out (export endpoint tests pass); independent GPT GitHub connector and automatic assistant push responses are not claimed as verified in this pass.

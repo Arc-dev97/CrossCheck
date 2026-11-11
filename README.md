@@ -1,4 +1,4 @@
-# Reconcile MVP
+# CrossCheck
 
 Google login is now required. Follow GOOGLE_LOGIN_SETUP.md to add your Google Web OAuth client credentials locally in .env and restart the server. The user has verified real Google sign-in and cross-account isolation. No development bypass exists in server.py.
 
@@ -6,7 +6,7 @@ Run `.\.venv\Scripts\python.exe server.py` and open http://localhost:8000. Keep 
 
 Install with `python -m venv .venv` then `.\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt`. Run tests with `.\.venv\Scripts\python.exe -m unittest discover -s tests -v`.
 
-36 engine/API/auth/scheduler/OAuth/event/live-source/GitHub tests pass. Browser QA verified the timer, pause/manual run, job editing and failed-run handling using a mocked provider and temporary database. Real Google login/isolation and ChatGPT tool flows were verified separately. Claude testing is deferred. Automatic ChatGPT responses remain unverified.
+43 engine/API/auth/scheduler/OAuth/event/live-source/GitHub/recoverable-reset tests pass. Browser QA verified the timer, pause/manual run, job editing and failed-run handling using a mocked provider and temporary database. Real Google login/isolation and ChatGPT tool flows were verified separately. Claude testing is deferred. Automatic ChatGPT responses remain unverified.
 
 ## Architecture
 
@@ -32,4 +32,14 @@ An authorized temporary HTTPS tunnel proxies to the updated app on port 8002. Th
 
 ## Limitations
 
-Two CSV or Supabase table sources, one exact matching key each, text/numeric comparisons. No fuzzy matching, many-to-many matching, arbitrary SQL/code, automatic source writes, retention/deletion workflow, or direct cloud storage integration. Numeric inputs are limited to 100 digits and exponent magnitude 100; each CSV is capped at 3.5 MB and 50,000 rows. Exported results include source records and escape formula-like key cells. File jobs pin saved versions; database jobs fetch fresh tables on each run. See LIVE_SOURCES_SETUP.md and IMPLEMENTATION_PLAN.md for the new workflow and remaining live setup checks.
+Two CSV or Supabase table sources, one exact matching key each, text/numeric comparisons. No fuzzy matching, many-to-many matching, arbitrary SQL/code, automatic source writes, automatic retention policies, or direct cloud storage integration. Numeric inputs are limited to 100 digits and exponent magnitude 100; each CSV is capped at 3.5 MB and 50,000 rows. Exported results include source records and escape formula-like key cells. File jobs pin saved versions; database jobs fetch fresh tables on each run. See LIVE_SOURCES_SETUP.md and IMPLEMENTATION_PLAN.md for the new workflow and remaining live setup checks.
+
+## Workspace navigation and demo reset
+
+CrossCheck uses five tabs: Run once, Scheduled jobs, Run history, Data sources and Notifications. Unsaved comparison inputs survive tab switches. Historical reports open separately from the current comparison. Assistant-created drafts can be loaded from Run once or their review links.
+
+Use the account menu → Reset demo data to review and clear only your generated datasets/snapshots, previews, runs, jobs, events and drafts. Connections, live sources, saved recipes, sign-in and actual Supabase tables are retained. The UI requires explicit confirmation; active job leases block reset and stale review counts require a new review. Undo last reset restores the archive, with jobs paused and old callbacks cancelled. Archives live in the same local SQLite database, so this is recovery from a demo reset rather than protection against disk loss.
+
+GitHub setup controls and job repository selectors are removed from the UI. For the demo, use CrossCheck MCP for run evidence and the assistant's independent GitHub connector for code review, supplying the repository/branch explicitly. That separate connector must be enabled in the assistant session. Existing backend repository tools remain compatible with previously connected clients.
+
+See UI_UX_IMPLEMENTATION_PLAN.md for the checked implementation and validation record.
