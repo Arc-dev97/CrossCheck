@@ -1,57 +1,882 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reconcile — CSV workbench</title><style>
-:root{font-family:Inter,Segoe UI,sans-serif;color:#1d2938;background:#f5f7fa}*{box-sizing:border-box}body{margin:0}header{background:#132c32;color:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center}header b{font-size:24px}header span{color:#b4d5d2;font-size:13px}main{max-width:1250px;margin:30px auto;padding:0 24px}h1{font-size:30px;margin:0 0 8px}h2{font-size:18px;margin-top:0}p{color:#627080;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{background:white;border:1px solid #dce3e9;border-radius:12px;padding:24px;margin-bottom:20px}button,.button{background:#087c70;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font:inherit;font-size:14px}button:disabled{opacity:.4;cursor:default}.secondary{background:#eaf2f1;color:#165a53}input,select{padding:9px;border:1px solid #cbd5df;border-radius:5px;max-width:100%;background:white}label{font-size:13px;display:block;margin:12px 0 6px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.comparison{display:grid;grid-template-columns:1fr 1fr 100px 80px 32px;gap:8px;margin:10px 0}.muted{font-size:13px;color:#627080}.hidden{display:none}.stats{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}.stat{background:#edf4f3;padding:12px 18px;border-radius:8px;min-width:105px}.stat b{display:block;font-size:24px}.stat span{font-size:12px}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;padding:12px;border-bottom:1px solid #e3e8ee;vertical-align:top}th{color:#607080;background:#f7f9fb}.scroll{overflow:auto;max-height:520px}.badge{display:inline-block;border-radius:20px;background:#eef2f6;padding:4px 9px;font-size:12px}.mismatch,.invalid_value,.duplicate_key,.invalid_key{background:#fff0d9;color:#835100}.matched{background:#dcf4e8;color:#17643a}#message{white-space:pre-wrap;padding:12px 0;color:#9b4020}details{max-width:700px}pre{white-space:pre-wrap;word-break:break-word;font-size:12px}.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}@media(max-width:750px){.grid{grid-template-columns:1fr}.comparison{grid-template-columns:1fr 1fr}header span{display:none}}
-#jobName{width:100%}#jobLeft,#jobRight,#jobRecipe{width:100%}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:#087c70;margin-bottom:14px}h1{font-size:42px;letter-spacing:-1.5px;line-height:1.12}.intro{max-width:730px;font-size:16px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}.steps>div{padding:16px 18px;border-left:3px solid #78b8ad;background:#edf3f2}.steps b,.steps span{display:block}.steps span{font-size:12px;color:#627080;margin-top:6px}.source-heading{display:flex;gap:12px;align-items:center;margin-bottom:22px}.source-heading h2{margin:0 0 4px}.letter{width:40px;height:40px;display:grid;place-items:center;background:#e1f0eb;color:#176457;border-radius:9px;font-weight:700}.explanation{white-space:pre-line;padding:16px;background:#f0f5f8;border-radius:7px;color:#31495a;font-size:14px;line-height:1.7}input[type=file]{width:100%;padding:20px;background:#fafcfd;border:1px dashed #a9bac8}h3{font-size:15px}.card{box-shadow:0 3px 12px #20304004}@media(max-width:750px){.steps{grid-template-columns:1fr}h1{font-size:32px}}</style></head><body><header><b>◈ Reconcile</b><div class="row"><span id="accountName">Signed-in workspace</span><form action="/auth/logout" method="post"><button class="secondary" type="submit">Sign out</button></form></div></header><main><nav class="row" style="margin-bottom:24px"><a href="#workbench">Compare files</a><a href="#databaseSources">Live sources</a><a href="#scheduled">Scheduled jobs</a><a href="#history">Completed runs</a></nav><div id="workbench" class="eyebrow">YOUR DATA, YOUR RULES</div><h1>Find what agrees.<br>Understand what doesn’t.</h1><p class="intro">Compare CSV exports or live database tables from your systems. Choose the identifiers that connect them, select the values to check, and review a traceable difference report.</p><div class="steps"><div><b>1 · Add sources</b><span>Any two tabular CSV exports</span></div><div><b>2 · Define the comparison</b><span>Matching key, fields, and tolerances</span></div><div><b>3 · Review differences</b><span>Preview, execute, and export</span></div></div><div class="row" style="margin:20px 0"><button id="demo">Try inventory example</button><button id="expenseDemo" class="secondary">Try employee expenses</button><span class="muted">Synthetic examples · inventory or employee expenses · intentional discrepancies</span></div><div class="grid"><section class="card"><div class="source-heading"><span class="letter">A</span><div><h2>Source A</h2><span id="leftName" class="muted">No file selected</span></div></div><input type="file" id="left" accept=".csv"><p id="leftInfo" class="muted">CSV only · up to 3.5 MB / 50,000 rows. IDs stay as text, including leading zeros.</p></section><section class="card"><div class="source-heading"><span class="letter">B</span><div><h2>Source B</h2><span id="rightName" class="muted">No file selected</span></div></div><input type="file" id="right" accept=".csv"><p id="rightInfo" class="muted">Use any domain: employees, products, shipments, registrations, or other records.</p></section></div><section id="sourceProfiles" class="card hidden"><h2>Explore your sources</h2><p class="muted">Inspect column names and sample values before deciding what to compare. Empty cells in unused columns do not affect the comparison.</p><div id="profiles" class="grid"></div></section><div id="message" role="alert"></div><section class="card" id="databaseSources"><div class="row" style="justify-content:space-between"><h2>Live database sources</h2><button id="refreshSources" class="secondary">Refresh sources</button></div><p>Connect Supabase tables once. Scheduled jobs fetch current records automatically and retain a snapshot of every run.</p><p id="sourceMessage" class="muted" role="status"></p><details><summary>1 · Connect a Supabase database</summary><p class="muted">Use a dedicated SELECT-only database role. The session-pooler host is recommended. Credentials stay encrypted on the server and are never sent through MCP.</p><div class="grid"><div><label for="connectionName">Connection name</label><input id="connectionName" value="Employee audit database"><label for="dbHost">Supabase database / pooler host</label><input id="dbHost" placeholder="aws-0-region.pooler.supabase.com"><label for="dbUser">Database username</label><input id="dbUser" autocomplete="off" placeholder="reconcile_reader.project-ref"><label for="dbPassword">Database password</label><input id="dbPassword" type="password" autocomplete="new-password"></div><div><label for="dbPort">Port</label><select id="dbPort"><option>5432</option><option>6543</option></select><label for="dbName">Database</label><input id="dbName" value="postgres"><label for="dbSchema">Schema</label><input id="dbSchema" value="reconcile_demo"></div></div><p><button id="connectDatabase">Test & save connection</button></p></details><details><summary>2 · Register a live table</summary><div class="grid"><div><label for="sourceConnection">Connection</label><select id="sourceConnection"></select><label for="sourceTable">Table</label><select id="sourceTable"></select><label for="sourceLabel">Source name</label><input id="sourceLabel" placeholder="Live employee expenses"><label for="sourceColumns">Columns (Ctrl-click to select several; primary key is always included)</label><select id="sourceColumns" multiple size="6" style="width:100%"></select></div><div><label for="sourceDateColumn">Optional date filter column</label><select id="sourceDateColumn"></select><label for="sourceDateFrom">From (inclusive)</label><input id="sourceDateFrom" type="date"><label for="sourceDateTo">Through (inclusive)</label><input id="sourceDateTo" type="date"><p class="muted">Tables need a primary key. Register two tables from the same connection for a consistent snapshot.</p></div></div><p><button id="saveSource">Save live source</button></p></details><div class="grid"><div><label for="compareSourceA">Live Source A</label><select id="compareSourceA"></select></div><div><label for="compareSourceB">Live Source B</label><select id="compareSourceB"></select></div></div><p><button id="snapshotSources">Fetch current tables & define rules</button></p><p class="muted" id="sourceSnapshotInfo">Fetching creates a fixed preview snapshot. Database jobs below fetch new snapshots on every run.</p></section>
-<section class="card" id="codeContexts"><h2>Code context for debugging</h2><p class="muted">Register the reconciliation application and the upstream pipeline code. Attach them to a scheduled job below. MCP can inspect permitted files and compare branches, with commit references.</p><details><summary>Add a GitHub repository</summary><div class="grid"><div><label for="repoName">Name</label><input id="repoName" placeholder="Expense import pipeline"><label for="repoUrl">Repository (owner/name or GitHub URL)</label><input id="repoUrl" placeholder="your-account/reconcile-demo"><label for="repoBranch">Default branch</label><input id="repoBranch" value="main"></div><div><label for="repoPaths">Relevant paths (one per line; folders end in /)</label><textarea id="repoPaths" rows="4" style="width:100%" placeholder="pipeline/&#10;app/&#10;server.py"></textarea><label for="repoToken">Read-only fine-grained token (private repositories only)</label><input id="repoToken" type="password" autocomplete="new-password"><p class="muted">Public repositories need no token. Limit a private token to Contents: read for the selected repository.</p></div></div><p><button id="saveRepository">Verify & save repository</button></p></details><p id="repoMessage" class="muted" role="status"></p><div id="repoList" class="muted"></div></section><section class="card"><h2>Assistant drafts</h2><p class="muted">Recipes created through MCP appear here for your review. Load a draft, edit its rules, then preview and execute yourself.</p><div class="row"><select id="drafts" aria-label="Assistant drafts"><option value="">No assistant drafts yet</option></select><button id="refreshDrafts" class="secondary">Refresh drafts</button><button id="loadDraft" class="secondary">Load draft</button></div></section><section id="editor" class="card hidden"><h2>Define your comparison</h2><p class="muted">A recipe is a reusable set of instructions. First choose one unique identifier in each file, then select pairs of values to compare. This creates a difference report; it does not overwrite or combine your sources.</p><div class="row"><label>Saved recipes <select id="savedRecipes"><option value="demo">Inventory demo recipe</option></select></label><button id="loadSaved" class="secondary">Load selected recipe</button><input id="recipeName" placeholder="Name your recipe" aria-label="Recipe name"><button class="secondary" id="save">Save recipe</button><span id="recipeStatus" class="muted" role="status">No recipe saved yet</span></div><p class="muted">Recipes are saved in this local workspace. Each save creates a new version. Load one after uploading your two files.</p><div class="grid"><div><label>Source A · matching key</label><select id="leftKey"></select></div><div><label>Source B · matching key</label><select id="rightKey"></select></div></div><div class="row" style="margin:16px 0"><label><input type="checkbox" id="trim" checked> Trim surrounding whitespace</label><label><input type="checkbox" id="ignoreCase" checked> Ignore letter case</label><label><input type="checkbox" id="includeMissing" checked> Include records with missing data</label></div><p class="muted">Normalization applies to matching keys and text comparisons. Missing keys and duplicate keys are isolated, never guessed. Missing-data flags check only selected keys and comparison fields, not unused columns. Uncheck to exclude these groups from results and exports; exclusion counts remain visible.</p><div class="comparison muted"><span>Source A column</span><span>Source B column</span><span>Type</span><span>Tolerance</span></div><div id="comparisons"></div><button class="secondary" id="add">+ Compare another field</button><p id="recipeSummary" class="explanation"></p><div class="actions"><button id="preview">Validate & preview</button><input id="runName" placeholder="Name this run (optional)" aria-label="Run name"><button id="execute" disabled>Execute & save run</button><label style="margin:0"><span class="button secondary">Load recipe <input id="load" type="file" accept=".json" style="display:none"></span></label></div></section><section id="output" class="card hidden"><div class="row" style="justify-content:space-between"><h2 id="resultTitle" tabindex="-1">Preview</h2><button id="download" class="secondary" disabled>Download results</button></div><p id="accounting" class="muted"></p><div id="stats" class="stats"></div><div class="row" style="margin-bottom:16px"><label>Filter <select id="filter"><option value="all">All results</option></select></label><span class="muted">Counts represent key groups, not individual rows. Matched means selected fields agree. Expand a record for original rows; CSV row IDs are line numbers; database row IDs contain primary-key values.</span></div><div class="scroll"><table><thead><tr><th>Normalized key</th><th>Status</th><th>Discrepancies</th><th>Source records</th></tr></thead><tbody id="rows"></tbody></table></div></section><section class="card" id="scheduled"><div class="row" style="justify-content:space-between"><h2>Scheduled jobs</h2><button class="secondary" id="refreshJobs">Refresh jobs & files</button></div><p class="muted">Choose fixed uploaded files or live database sources and a saved recipe. Live sources are fetched at every run; each result preserves its exact inputs. The scheduler runs while the app server is running.</p><div class="grid"><div><label for="jobMode">Input type</label><select id="jobMode"><option value="files">Saved file versions / snapshots</option><option value="database">Live database tables</option></select><label for="jobName">Job name</label><input id="jobName" placeholder="Daily employee expense check"><label for="jobLeft">Source A</label><select id="jobLeft"></select><label for="jobRecipe">Saved recipe</label><select id="jobRecipe"></select></div><div><label for="jobRight">Source B</label><select id="jobRight"></select><label for="jobInterval">Run every</label><div class="row"><input id="jobInterval" type="number" value="60" min="1" style="width:100px"><select id="jobUnit" aria-label="Interval unit"><option value="1">seconds</option><option value="60">minutes</option><option value="3600">hours</option><option value="86400">days</option></select></div><p class="muted">15 seconds minimum for the demo. Use 1 day for a daily job.</p></div></div><div class="grid"><div><label for="jobAppRepo">Application repository (optional)</label><select id="jobAppRepo"></select></div><div><label for="jobPipelineRepo">Source pipeline repository (optional)</label><select id="jobPipelineRepo"></select></div></div><div class="actions"><button id="createJob">Create & start job</button><button id="updateJob" class="secondary" disabled>Save job changes</button><button id="useCurrentFiles" class="secondary">Use files currently loaded above</button></div><p id="jobMessage" class="muted" role="status"></p><div class="scroll"><table><thead><tr><th>Job / interval</th><th>Next run</th><th>Latest result</th><th>Actions</th></tr></thead><tbody id="jobRows"><tr><td colspan="4">No scheduled jobs yet.</td></tr></tbody></table></div><details id="notificationPanel" style="max-width:none;margin-top:20px"><summary id="notificationHeading" style="cursor:pointer;font-weight:600">Job notifications</summary><p class="muted">Events are saved in your workspace. A verified assistant subscription enables webhook delivery. Accepted means the receiver acknowledged the event; assistant processing happens afterward.</p><p id="subscriptionStatus" class="muted">Checking assistant subscriptions…</p><p id="runOpenStatus" class="muted" role="status" aria-live="polite"></p><div id="jobEvents" class="muted">No job events yet.</div><div class="row"><button id="notificationsPrev" class="secondary">Previous notifications</button><span id="notificationsPage" class="muted"></span><button id="notificationsNext" class="secondary">Next notifications</button><label>Per page <select id="notificationsSize"><option>5</option><option>10</option><option>20</option></select></label></div></details></section><section class="card" id="history"><h2>Completed runs</h2><p class="muted">Executed results are saved with their exact source files and recipe. Reopening a run shows that snapshot, even after you change your current recipe.</p><div class="row"><select id="runHistory" aria-label="Completed runs"><option value="">No completed runs yet</option></select><button id="openRun" class="secondary">Open saved run</button></div></section></main><script>
-const statusLabel=k=>({matched:'Agrees',mismatch:'Different values',left_only:'Only in Source A',right_only:'Only in Source B',invalid_key:'Missing identifier',duplicate_key:'Duplicate identifier',invalid_value:'Invalid number',missing_data:'Missing data'}[k]||k);
-const $=id=>document.getElementById(id);let source={left:'',right:''},columns={},current=null,approved=null,executed=false;
-let workspaceKey=null,jobRecords=[],editingJob=null;
-let ids={left:null,right:null},names={left:'Source A.csv',right:'Source B.csv'},previewId=null,runId=null,revision=0,recipeRecords=[];
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function invalidate(){revision++;if($('recipeName').value)$('recipeStatus').textContent='Unsaved changes';previewId=null;runId=null;updateSummary();persistWorkspace();approved=null;current=null;executed=false;$('execute').disabled=true;$('download').disabled=true;$('output').classList.add('hidden')}
-async function api(path,body,method='POST'){const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(r.status===401){location.href='/';throw Error('Session expired. Sign in again.');}if(!r.ok)throw Error(j.error||j.detail||'Request failed');return j}
-function options(cols,value){return cols.map(c=>`<option ${c===value?'selected':''} value="${esc(c)}">${esc(c)}</option>`).join('')}
-function addComparison(c={}){const row=document.createElement('div');row.className='comparison';row.innerHTML=`<select class="lc">${options(columns.left,c.left)}</select><select class="rc">${options(columns.right,c.right)}</select><select class="kind"><option value="text">Text</option><option value="number">Number</option></select><input class="tolerance" type="number" min="0" step="any" value="${esc(c.tolerance??0)}" aria-label="Tolerance"><button class="secondary" aria-label="Remove comparison">×</button>`;row.querySelector('.kind').value=c.type||'text';row.querySelector('button').onclick=()=>{row.remove();invalidate()};$('comparisons').append(row);updateSummary()}
-function recipe(){return {left_key:$('leftKey').value,right_key:$('rightKey').value,trim:$('trim').checked,ignore_case:$('ignoreCase').checked,include_missing:$('includeMissing').checked,comparisons:[...$('comparisons').children].map(r=>({left:r.querySelector('.lc').value,right:r.querySelector('.rc').value,type:r.querySelector('.kind').value,tolerance:r.querySelector('.tolerance').value}))}}
-function setRecipe(r){
-if(!r || !Array.isArray(r.comparisons) || !columns.left?.includes(r.left_key) || !columns.right?.includes(r.right_key) || r.comparisons.some(c=>!columns.left.includes(c.left)||!columns.right.includes(c.right)))throw Error('Recipe columns do not match these files. Upload compatible files or edit the mapping manually.');
-$('includeMissing').checked=r.include_missing!==false;$('leftKey').value=r.left_key;$('rightKey').value=r.right_key;$('trim').checked=r.trim!==false;$('ignoreCase').checked=r.ignore_case!==false;$('comparisons').innerHTML='';r.comparisons.forEach(addComparison);invalidate()}
-async function inspect(){invalidate();$('editor').classList.add('hidden');$('sourceProfiles').classList.add('hidden');if(!source.left||!source.right)return;for(const side of ['left','right'])if(!ids[side]){const d=await api('/api/datasets',{name:names[side],text:source[side]});ids[side]=d.id;}const p=await api('/api/profile',{left_id:ids.left,right_id:ids.right});columns={left:p.left_columns,right:p.right_columns};for(const side of ['left','right']){$(side+'Info').textContent=`${p[side].rows} rows · ${p[side].columns.length} columns · ${p[side].columns.filter(c=>c.empty).length} columns contain empty cells`;$(side+'Key').innerHTML=options(columns[side]);} $('comparisons').innerHTML='';addComparison();$('editor').classList.remove('hidden');$('sourceProfiles').classList.remove('hidden');
-$('profiles').innerHTML=['left','right'].map(side=>'<div><h3>Source '+(side==='left'?'A':'B')+'</h3><div class="scroll" style="max-height:260px"><table><thead><tr><th>Column</th><th>Samples</th><th>Empty</th><th>Repeated values</th></tr></thead><tbody>'+p[side].columns.map(c=>'<tr><td>'+esc(c.name)+'</td><td>'+esc(c.samples.filter(v=>v.trim()).slice(0,3).join(' · ')||'(empty)')+'</td><td>'+c.empty+'</td><td>'+c.duplicate_values+'</td></tr>').join('')+'</tbody></table></div></div>').join('');updateSummary();persistWorkspace();await refreshJobChoices()}
-function updateSummary(){if(!$('leftKey')?.value)return;const r=recipe();$('recipeSummary').textContent=['Match '+r.left_key+' (Source A) to '+r.right_key+' (Source B).','Compare selected fields:',...r.comparisons.map(c=>'• '+c.left+' ↔ '+c.right+(c.type==='number'?' — number; allowed difference '+c.tolerance:' — text')),r.include_missing?'Flag and include records with missing selected values.':'Exclude records with missing selected values.'].join('\n')}
-function persistWorkspace(){try{if(workspaceKey&&ids.left&&ids.right)localStorage.setItem(workspaceKey,JSON.stringify({ids,names,recipe:$('leftKey').value?recipe():null}))}catch{}}
-
-function render(){const f=$('filter').value;const visible=current.results.filter(r=>f==='all'||r.status===f);$('rows').innerHTML=visible.map(r=>`<tr><td>${esc(r.key||'(blank)')}</td><td><span class="badge ${r.status}">${esc(statusLabel(r.status))}</span>${r.missing_data&&r.status!=='missing_data'?'<br><span class="badge invalid_value">Missing data</span>':''}</td><td>${r.missing_data?'<div>Missing: '+r.missing_fields.map(m=>esc(m.side+' row '+m.row+': '+m.column)).join(', ')+'</div>':''}${r.details.map(d=>`${esc(d.left_column)}: <b>${esc(d.left||'(empty)')}</b> → <b>${esc(d.right||'(empty)')}</b>${d.difference!==null?' (Δ '+esc(d.difference)+')':''} ${d.reason==='invalid_number'?'— invalid number':''}`).join('<br>')||'—'}</td><td><details><summary>${r.left_rows.length} Source A / ${r.right_rows.length} Source B rows</summary><pre>${esc(JSON.stringify({source_a:r.left_rows,source_b:r.right_rows},null,2))}</pre></details></td></tr>`).join('')}
-async function guard(fn){$('message').textContent='';try{await fn()}catch(e){$('message').textContent=e.message}}
-for(const side of ['left','right'])$(side).onchange=()=>guard(async()=>{invalidate();ids[side]=null;source[side]='';const file=$(side).files[0];$(side+'Name').textContent=file?file.name:'No file selected';if(file){names[side]=file.name;if(!file.name.toLowerCase().endsWith('.csv'))throw Error('Please choose a CSV file.');if(file.size>3500000)throw Error('Each file must be under 3.5 MB.');source[side]=await file.text()}await inspect()});
-$('demo').onclick=()=>guard(async()=>{ids={left:null,right:null};names={left:'warehouse.csv',right:'store.csv'};$('leftName').textContent='warehouse.csv · example';$('rightName').textContent='store.csv · example';$('left').value='';$('right').value='';for(const s of ['left','right'])source[s]=await(await fetch('/demo/'+(s==='left'?'warehouse':'store')+'.csv')).text();await inspect();setRecipe(await(await fetch('/demo/recipe.json')).json())});
-$('expenseDemo').onclick=()=>guard(async()=>{ids={left:null,right:null};names={left:'employee_expenses.csv',right:'uploaded_invoices.csv'};for(const side of ['left','right']){$(side).value='';$(side+'Name').textContent=names[side]+' · synthetic example';source[side]=await(await fetch('/demo/'+names[side])).text();}await inspect();setRecipe(await(await fetch('/demo/expense_recipe.json')).json());$('runName').value='October employee expense audit';});
-$('editor').addEventListener('input',e=>{if(e.target.id==='recipeName')$('recipeStatus').textContent='Name changed — click Save recipe';else if(!['runName','load'].includes(e.target.id))invalidate();});$('add').onclick=()=>{addComparison();invalidate()};
-function showResult(result,title){current=result;$('output').classList.remove('hidden');$('resultTitle').textContent=title;const a=result.accounting;$('accounting').textContent=`All source rows accounted for: Source A ${a.left_accounted}/${a.left_input}, Source B ${a.right_accounted}/${a.right_input}. Missing-data groups: ${result.missing_groups}. Excluded groups: ${result.excluded_groups} (${result.excluded_source_rows.left} Source A rows, ${result.excluded_source_rows.right} Source B rows).`;$('stats').innerHTML=Object.entries(result.summary).map(([k,v])=>`<div class="stat"><b>${v}</b><span>${esc(statusLabel(k))}</span></div>`).join('');$('filter').innerHTML='<option value="all">All results</option>'+Object.keys(result.summary).map(k=>`<option value="${k}">${statusLabel(k)}</option>`).join('');render()}
-$('preview').onclick=()=>guard(async()=>{const token=revision;const r=recipe();const result=await api('/api/previews',{left_id:ids.left,right_id:ids.right,recipe:r});if(token!==revision)throw Error('Inputs changed during preview. Preview again.');previewId=result.preview_id;approved=JSON.stringify(r);executed=false;$('execute').disabled=false;$('download').disabled=true;showResult(result,'Preview — review before executing');persistWorkspace()});
-$('execute').onclick=()=>guard(async()=>{if(!previewId||approved!==JSON.stringify(recipe()))throw Error('Recipe changed. Preview again.');const token=revision;const run=await api('/api/runs',{preview_id:previewId,name:$('runName').value.trim()});await refreshRuns();if(token!==revision)throw Error('Run saved, but the workspace changed. Open it from Completed runs.');runId=run.id;executed=true;$('execute').disabled=true;$('download').disabled=false;showResult(run.result,(run.name||'Reconciliation')+' — '+new Date(run.created_at).toLocaleString())});$('filter').onchange=render;
-function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-async function refreshSaved(){recipeRecords=await(await fetch('/api/recipes')).json();$('savedRecipes').innerHTML='<option value="demo">Inventory demo recipe</option><option value="expenses">Employee expense audit recipe</option>'+recipeRecords.map(r=>`<option value="${r.id}">${esc(r.name)} · ${esc(new Date(r.created_at).toLocaleString())}</option>`).join('')}
-$('save').onclick=()=>guard(async()=>{const name=$('recipeName').value.trim();if(!name)throw Error('Enter a recipe name first.');const r=await api('/api/recipes',{name,recipe:recipe()});await refreshSaved();$('savedRecipes').value=r.id;$('recipeStatus').textContent='Saved: '+r.name+' at '+new Date(r.created_at).toLocaleTimeString();$('message').textContent='Recipe saved in the local workspace.';await refreshJobChoices()});
-$('loadSaved').onclick=()=>guard(async()=>{const id=$('savedRecipes').value;const r=id==='demo'?await(await fetch('/demo/recipe.json')).json():id==='expenses'?await(await fetch('/demo/expense_recipe.json')).json():recipeRecords.find(r=>r.id===id)?.recipe;setRecipe(r)});$('load').onchange=()=>guard(async()=>setRecipe(JSON.parse(await $('load').files[0].text())));
-$('download').onclick=()=>{if(executed&&runId)window.location.href='/api/runs/'+runId+'/export'};
-let draftRecords=[];
-async function refreshDrafts(){draftRecords=await(await fetch('/api/drafts')).json();$('drafts').innerHTML=draftRecords.length?draftRecords.map(d=>`<option value="${d.id}">${esc(d.name)} — ${esc(new Date(d.created_at).toLocaleString())}</option>`).join(''):'<option value="">No assistant drafts yet</option>'}
-async function loadDraft(id){const d=draftRecords.find(d=>d.id===id);if(!d)throw Error('Draft not found. Refresh drafts first.');await restoreSources({left:d.left_id,right:d.right_id},null,d.recipe);$('runName').value=d.name;$('recipeName').value=d.name;$('recipeStatus').textContent='Assistant draft loaded — review before saving';$('message').textContent='Draft loaded. Review the rules, then validate & preview.';}
-$('refreshDrafts').onclick=()=>guard(refreshDrafts);$('loadDraft').onclick=()=>guard(async()=>loadDraft($('drafts').value));
-async function refreshRuns(){const previous=$('runHistory').value;const runs=await getJson('/api/runs');$('runHistory').innerHTML=runs.length?runs.map(r=>`<option value="${r.id}">${esc(r.name||'Reconciliation')} — ${esc(new Date(r.created_at).toLocaleString())}</option>`).join(''):'<option value="">No completed runs yet</option>';if(runs.some(r=>r.id===previous))$('runHistory').value=previous;}
-async function restoreSources(pair,labels,r){ids={...pair};for(const side of ['left','right']){const response=await fetch('/api/datasets/'+ids[side]);if(!response.ok)throw Error('Saved source is unavailable. Please upload again.');const d=await response.json();source[side]=d.text||'database snapshot';names[side]=d.name;$(side+'Name').textContent=d.name;}await inspect();if(r)setRecipe(r)}
-async function openSavedRun(id){if(!id)throw Error('Execute a preview to create your first saved run.');const run=await getJson('/api/runs/'+encodeURIComponent(id));await restoreSources({left:run.left_id,right:run.right_id},null,run.recipe);runId=run.id;executed=true;$('runHistory').value=run.id;$('runName').value=run.name||'';$('execute').disabled=true;$('download').disabled=false;showResult(run.result,(run.name||'Reconciliation')+' — '+new Date(run.created_at).toLocaleString());$('output').scrollIntoView({behavior:'auto',block:'start'});$('resultTitle').focus({preventScroll:true});return run;}
-$('openRun').onclick=()=>guard(async()=>{const button=$('openRun');button.disabled=true;try{await openSavedRun($('runHistory').value)}finally{button.disabled=false}});
-async function getJson(path){const r=await fetch(path);const d=await r.json();if(!r.ok)throw Error(d.error||d.detail||'Could not load workspace.');return d}
-async function refreshJobChoices(){const [files,recipes,live,repos]=await Promise.all([getJson('/api/datasets'),getJson('/api/recipes'),getJson('/api/sources'),getJson('/api/repositories')]);const datasets=$('jobMode').value==='database'?live:files;for(const id of ['jobAppRepo','jobPipelineRepo']){const previous=$(id).value;$(id).innerHTML='<option value="">No repository attached</option>'+repos.map(r=>`<option value="${r.id}">${esc(r.name)} · ${esc(r.branch)}</option>`).join('');$(id).value=previous;}for(const id of ['jobLeft','jobRight']){const previous=$(id).value;$(id).innerHTML='<option value="">Choose a source</option>'+datasets.map(d=>`<option value="${d.id}">${esc(d.name)} · ${d.rows===undefined?'live table':d.rows+' rows'} · ${esc(new Date(d.created_at).toLocaleString())}</option>`).join('');if(datasets.some(d=>d.id===previous))$(id).value=previous;}const previous=$('jobRecipe').value;$('jobRecipe').innerHTML='<option value="">Choose a saved recipe</option>'+recipes.map(r=>`<option value="${r.id}">${esc(r.name)} · ${esc(new Date(r.created_at).toLocaleString())}</option>`).join('');if(recipes.some(r=>r.id===previous))$('jobRecipe').value=previous;}
-function jobPayload(){const interval=Number($('jobInterval').value)*Number($('jobUnit').value);if(!Number.isInteger(interval)||interval<15||interval>604800)throw Error('Choose an interval between 15 seconds and 7 days.');if(!$('jobLeft').value||!$('jobRight').value||!$('jobRecipe').value)throw Error('Select both files and a saved recipe.');return {source_mode:$('jobMode').value,application_repo_id:$('jobAppRepo').value||null,pipeline_repo_id:$('jobPipelineRepo').value||null,name:$('jobName').value.trim(),left_id:$('jobLeft').value,right_id:$('jobRight').value,recipe_id:$('jobRecipe').value,interval_seconds:interval,enabled:editingJob?jobRecords.find(j=>j.id===editingJob).enabled:true}}
-async function jobGuard(fn){$('jobMessage').textContent='';try{await fn()}catch(e){$('jobMessage').textContent=e.message}}
-function intervalLabel(seconds){for(const [unit,size] of [['day',86400],['hour',3600],['minute',60]])if(seconds%size===0)return (seconds/size)+' '+unit+(seconds/size===1?'':'s');return seconds+' seconds'}
-async function refreshJobs(){const [jobs,subscriptions]=await Promise.all([getJson('/api/jobs'),getJson('/api/subscriptions')]);const active=subscriptions.filter(s=>s.active);$('subscriptionStatus').textContent=active.length?active.length+' active assistant subscription(s). Next expiration: '+new Date(Math.min(...active.map(s=>s.expires))*1000).toLocaleString():'No active assistant subscriptions. Ask ChatGPT to monitor reconciliation.finished through the connected plugin.';jobRecords=jobs;$('jobRows').innerHTML=jobs.length?jobs.map(j=>`<tr><td><b>${esc(j.name)}</b><br>${j.source_mode==='database'?'Live tables':'Saved versions'} · Every ${intervalLabel(j.interval_seconds)} · ${esc(j.state)}</td><td>${j.enabled?esc(new Date(j.next_run_at*1000).toLocaleString()):'Paused'}</td><td>${esc(j.last_status.replaceAll('_',' '))}${j.last_error?'<br>'+esc(j.last_error):''}</td><td><div class="row"><button class="secondary" data-action="edit" data-id="${j.id}">Edit</button><button class="secondary" data-action="toggle" data-id="${j.id}">${j.enabled?'Pause':'Resume'}</button><button class="secondary" data-action="run" data-id="${j.id}" ${j.state==='running'?'disabled':''}>Run now</button></div></td></tr>`).join(''):'<tr><td colspan="4">No scheduled jobs yet.</td></tr>';await refreshNotifications();}
-$('createJob').onclick=()=>jobGuard(async()=>{editingJob=null;const j=await api('/api/jobs',jobPayload());$('jobMessage').textContent='Scheduled '+j.name+'. First run: '+new Date(j.next_run_at*1000).toLocaleTimeString();await refreshJobs()});
-$('updateJob').onclick=()=>jobGuard(async()=>{if(!editingJob)throw Error('Choose Edit on a job first.');await api('/api/jobs/'+editingJob,jobPayload(),'PUT');$('jobMessage').textContent='Job settings saved.';await refreshJobs()});
-$('refreshJobs').onclick=()=>jobGuard(async()=>{await refreshJobChoices();await refreshJobs()});
-$('useCurrentFiles').onclick=()=>jobGuard(async()=>{$('jobMode').value='files';await refreshJobChoices();if(!ids.left||!ids.right)throw Error('Upload or load two files first.');$('jobLeft').value=ids.left;$('jobRight').value=ids.right;const selected=$('savedRecipes').value;if(!['demo','expenses'].includes(selected))$('jobRecipe').value=selected;$('jobMessage').textContent='Current files selected. Choose a saved recipe before starting.';});
-$('jobRows').onclick=e=>jobGuard(async()=>{const button=e.target.closest('button[data-action]');if(!button)return;const job=jobRecords.find(j=>j.id===button.dataset.id);if(button.dataset.action==='edit'){$('jobMode').value=job.source_mode||'files';await refreshJobChoices();$('jobAppRepo').value=job.application_repo_id||'';$('jobPipelineRepo').value=job.pipeline_repo_id||'';editingJob=job.id;$('jobName').value=job.name;$('jobLeft').value=job.left_id;$('jobRight').value=job.right_id;$('jobRecipe').value=job.recipe_id;const unit=[86400,3600,60,1].find(u=>job.interval_seconds%u===0);$('jobInterval').value=job.interval_seconds/unit;$('jobUnit').value=String(unit);$('updateJob').disabled=false;$('jobMessage').textContent='Editing '+job.name+'. Save job changes when ready.';}else if(button.dataset.action==='toggle'){await api('/api/jobs/'+job.id+'/enabled',{enabled:!job.enabled});await refreshJobs()}else{button.disabled=true;try{const j=await api('/api/jobs/'+job.id+'/run',{});$('jobMessage').textContent=j.name+': '+j.last_status.replaceAll('_',' ');await refreshJobs();await refreshRuns()}finally{button.disabled=false}}});
-window.addEventListener('DOMContentLoaded',()=>guard(async()=>{const auth=await getJson('/api/auth/me');if(!auth.authenticated){location.href='/';return;}workspaceKey='reconcile.workspace.'+auth.user.id;$('accountName').textContent=auth.user.name+' · '+auth.user.email;await refreshSaved();await refreshRuns();await refreshDrafts();await refreshJobChoices();await refreshLiveSources();await refreshRepositories();await refreshJobs();setInterval(()=>refreshJobs().then(refreshRuns).catch(()=>{}),5000);const draftId=new URLSearchParams(location.search).get('draft');if(draftId){await loadDraft(draftId);return;}let workspace;try{workspace=JSON.parse(localStorage.getItem(workspaceKey)||'null')}catch{}if(workspace)await restoreSources(workspace.ids,workspace.names,workspace.recipe)}));
-</script><script src="/assets/live.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>
+   CrossCheck — Reconciliation workspace
+  </title>
+  <link href="/assets/workspace.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <header class="app-header">
+   <a aria-label="CrossCheck home" class="brand" href="#once">
+    <span aria-hidden="true" class="brand-mark">
+     ✓
+    </span>
+    CrossCheck
+   </a>
+   <div class="header-actions">
+    <span class="workspace-pill">
+     Your workspace
+    </span>
+    <button aria-label="Open notifications" class="icon-button" id="headerNotifications">
+     Notifications
+     <span class="count" id="notificationCount">
+      0
+     </span>
+    </button>
+    <details class="account-menu">
+     <summary>
+      <span aria-hidden="true" class="avatar">
+       S
+      </span>
+      <span id="accountName">
+       Account
+      </span>
+      <span aria-hidden="true">
+       ⌄
+      </span>
+     </summary>
+     <div class="account-options">
+      <button class="menu-danger" id="reviewReset">
+       Reset demo data
+      </button>
+      <button class="secondary" disabled="" id="undoReset">
+       Undo last reset
+      </button>
+      <form action="/auth/logout" method="post">
+       <button class="secondary" type="submit">
+        Sign out
+       </button>
+      </form>
+     </div>
+    </details>
+   </div>
+  </header>
+  <nav aria-label="Workspace" class="tab-nav" role="tablist">
+   <button aria-controls="panel-once" aria-selected="true" data-tab="once" id="tab-once" role="tab" tabindex="0">
+    Run once
+   </button>
+   <button aria-controls="panel-scheduled" aria-selected="false" data-tab="scheduled" id="tab-scheduled" role="tab" tabindex="-1">
+    Scheduled jobs
+   </button>
+   <button aria-controls="panel-history" aria-selected="false" data-tab="history" id="tab-history" role="tab" tabindex="-1">
+    Run history
+   </button>
+   <button aria-controls="panel-data" aria-selected="false" data-tab="data" id="tab-data" role="tab" tabindex="-1">
+    Data sources
+   </button>
+   <button aria-controls="panel-notifications" aria-selected="false" data-tab="notifications" id="tab-notifications" role="tab" tabindex="-1">
+    Notifications
+   </button>
+  </nav>
+  <main id="appMain">
+   <div id="message" role="alert" tabindex="-1">
+   </div>
+   <p class="workspace-notice" id="workspaceNotice" role="status">
+   </p>
+   <section aria-labelledby="tab-once" class="tab-panel" id="panel-once" role="tabpanel">
+    <div class="page-heading">
+     <div>
+      <p class="eyebrow">
+       WORKSPACE / RUN ONCE
+      </p>
+      <h1>
+       Run once
+      </h1>
+      <p>
+       Compare two sources, review your rules, and save a traceable report.
+      </p>
+     </div>
+    </div>
+    <ol aria-label="Reconciliation steps" class="steps">
+     <li class="current" data-step="1">
+      <span>
+       1
+      </span>
+      Choose sources
+     </li>
+     <li data-step="2">
+      <span>
+       2
+      </span>
+      Define rules
+     </li>
+     <li data-step="3">
+      <span>
+       3
+      </span>
+      Review &amp; execute
+     </li>
+    </ol>
+    <section class="card source-card">
+     <div class="section-heading">
+      <div>
+       <span class="eyebrow">
+        ONE-OFF RECONCILIATION
+       </span>
+       <h2>
+        1 · Choose your sources
+       </h2>
+      </div>
+      <div aria-label="Source type" class="segmented" role="group">
+       <button aria-pressed="true" class="selected" id="chooseCsv" type="button">
+        CSV files
+       </button>
+       <button aria-pressed="false" id="chooseDatabase" type="button">
+        Database tables
+       </button>
+      </div>
+     </div>
+     <div id="onceCsv">
+      <div class="grid">
+       <section class="card">
+        <div class="source-heading">
+         <span class="letter">
+          A
+         </span>
+         <div>
+          <h2>
+           Source A
+          </h2>
+          <span class="muted" id="leftName">
+           No file selected
+          </span>
+         </div>
+        </div>
+        <label for="left">
+         Upload Source A CSV
+        </label>
+        <input accept=".csv" id="left" type="file"/>
+        <p class="muted" id="leftInfo">
+         CSV only · up to 3.5 MB / 50,000 rows. IDs stay as text, including leading zeros.
+        </p>
+       </section>
+       <section class="card">
+        <div class="source-heading">
+         <span class="letter">
+          B
+         </span>
+         <div>
+          <h2>
+           Source B
+          </h2>
+          <span class="muted" id="rightName">
+           No file selected
+          </span>
+         </div>
+        </div>
+        <label for="right">
+         Upload Source B CSV
+        </label>
+        <input accept=".csv" id="right" type="file"/>
+        <p class="muted" id="rightInfo">
+         Use any domain: employees, products, shipments, registrations, or other records.
+        </p>
+       </section>
+      </div>
+      <div class="row demo-actions" style="margin:20px 0">
+       <button id="demo">
+        Try inventory example
+       </button>
+       <button class="secondary" id="expenseDemo">
+        Try employee expenses
+       </button>
+       <span class="muted">
+        Synthetic examples · inventory or employee expenses · intentional discrepancies
+       </span>
+      </div>
+     </div>
+     <div class="hidden" id="onceLive">
+      <div class="grid">
+       <div>
+        <label for="compareSourceA">
+         Live Source A
+        </label>
+        <select id="compareSourceA">
+        </select>
+       </div>
+       <div>
+        <label for="compareSourceB">
+         Live Source B
+        </label>
+        <select id="compareSourceB">
+        </select>
+       </div>
+      </div>
+      <p>
+       <button id="snapshotSources">
+        Fetch current tables &amp; define rules
+       </button>
+      </p>
+      <p class="muted" id="sourceSnapshotInfo">
+       Fetching creates a fixed preview snapshot. Live jobs in Scheduled jobs fetch new snapshots on every run.
+      </p>
+     </div>
+    </section>
+    <details class="card assistant-drafts">
+     <summary>
+      Load an assistant-created draft
+     </summary>
+     <p class="muted">
+      Recipes created through MCP appear here for your review. Load a draft, edit its rules, then preview and execute yourself.
+     </p>
+     <div class="row">
+      <select aria-label="Assistant drafts" id="drafts">
+       <option value="">
+        No assistant drafts yet
+       </option>
+      </select>
+      <button class="secondary" id="refreshDrafts">
+       Refresh drafts
+      </button>
+      <button class="secondary" id="loadDraft">
+       Load draft
+      </button>
+     </div>
+    </details>
+    <details class="card hidden" id="sourceProfiles">
+     <summary>
+      Inspect source columns and samples
+     </summary>
+     <p class="muted">
+      Inspect column names and sample values before deciding what to compare. Empty cells in unused columns do not affect the comparison.
+     </p>
+     <div class="grid" id="profiles">
+     </div>
+    </details>
+    <section class="card hidden" id="editor">
+     <h2>
+      2 · Define the rules
+     </h2>
+     <p class="source-pair" id="sourcePair">
+     </p>
+     <p class="muted">
+      Match records using an identifier, then choose the fields and tolerances to compare.
+     </p>
+     <div class="row">
+      <label>
+       Saved recipes
+       <select id="savedRecipes">
+        <option value="demo">
+         Inventory demo recipe
+        </option>
+       </select>
+      </label>
+      <button class="secondary" id="loadSaved">
+       Load selected recipe
+      </button>
+      <input aria-label="Recipe name" id="recipeName" placeholder="Name your recipe"/>
+      <button class="secondary" id="save">
+       Save recipe
+      </button>
+      <span class="muted" id="recipeStatus" role="status">
+       No recipe saved yet
+      </span>
+     </div>
+     <p class="muted">
+      Save a reusable recipe, or load one compatible with your selected sources.
+     </p>
+     <div class="grid">
+      <div>
+       <label for="leftKey">
+        Source A · matching key
+       </label>
+       <select id="leftKey">
+       </select>
+      </div>
+      <div>
+       <label for="rightKey">
+        Source B · matching key
+       </label>
+       <select id="rightKey">
+       </select>
+      </div>
+     </div>
+     <div class="row" style="margin:16px 0">
+      <label>
+       <input checked="" id="trim" type="checkbox"/>
+       Trim surrounding whitespace
+      </label>
+      <label>
+       <input checked="" id="ignoreCase" type="checkbox"/>
+       Ignore letter case
+      </label>
+      <label>
+       <input checked="" id="includeMissing" type="checkbox"/>
+       Include records with missing data
+      </label>
+     </div>
+     <p class="muted">
+      Trim and case settings apply to identifiers and text. Missing and duplicate identifiers are flagged, never guessed.
+     </p>
+     <div class="comparison muted">
+      <span>
+       Source A column
+      </span>
+      <span>
+       Source B column
+      </span>
+      <span>
+       Type
+      </span>
+      <span>
+       Tolerance
+      </span>
+     </div>
+     <div id="comparisons">
+     </div>
+     <button class="secondary" id="add">
+      + Compare another field
+     </button>
+     <p class="explanation" id="recipeSummary">
+     </p>
+     <div class="actions">
+      <button id="preview">
+       Validate &amp; preview
+      </button>
+      <input aria-label="Run name" id="runName" placeholder="Name this run (optional)"/>
+      <button disabled="" id="execute">
+       Execute &amp; save run
+      </button>
+      <label style="margin:0">
+       <span class="button secondary">
+        Load recipe
+        <input accept=".json" id="load" style="display:none" type="file"/>
+       </span>
+      </label>
+     </div>
+    </section>
+    <section class="card hidden" id="output">
+     <div class="row" style="justify-content:space-between">
+      <h2 id="resultTitle" tabindex="-1">
+       Preview
+      </h2>
+      <button class="secondary" disabled="" id="download">
+       Download results
+      </button>
+     </div>
+     <p class="muted" id="accounting">
+     </p>
+     <div class="stats" id="stats">
+     </div>
+     <div class="row" style="margin-bottom:16px">
+      <label>
+       Filter
+       <select aria-label="Filter current comparison" id="filter">
+        <option value="all">
+         All results
+        </option>
+       </select>
+      </label>
+      <span class="muted">
+       Counts represent key groups, not individual rows. Matched means selected fields agree. Expand a record for original rows; CSV row IDs are line numbers; database row IDs contain primary-key values.
+      </span>
+     </div>
+     <div class="scroll">
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Normalized key
+         </th>
+         <th>
+          Status
+         </th>
+         <th>
+          Discrepancies
+         </th>
+         <th>
+          Source records
+         </th>
+        </tr>
+       </thead>
+       <tbody id="rows">
+       </tbody>
+      </table>
+     </div>
+    </section>
+   </section>
+   <section aria-labelledby="tab-scheduled" class="tab-panel" hidden="" id="panel-scheduled" role="tabpanel">
+    <div class="page-heading">
+     <div>
+      <p class="eyebrow">
+       WORKSPACE / SCHEDULED JOBS
+      </p>
+      <h1>
+       Scheduled jobs
+      </h1>
+      <p>
+       Repeatable checks that keep pace with your changing data.
+      </p>
+     </div>
+     <button id="newJob">
+      + New scheduled job
+     </button>
+    </div>
+    <div class="toolbar">
+     <span class="muted" id="jobCount">
+      Loading jobs…
+     </span>
+     <button class="secondary" id="refreshJobs">
+      Refresh jobs &amp; files
+     </button>
+    </div>
+    <section class="jobs-area" id="scheduled">
+     <details class="card job-form" id="jobForm">
+      <summary id="jobFormTitle">
+       Create a scheduled job
+      </summary>
+      <div class="grid">
+       <div>
+        <label for="jobMode">
+         Input type
+        </label>
+        <select id="jobMode">
+         <option value="files">
+          Saved file versions / snapshots
+         </option>
+         <option value="database">
+          Live database tables
+         </option>
+        </select>
+        <label for="jobName">
+         Job name
+        </label>
+        <input id="jobName" placeholder="Daily employee expense check"/>
+        <label for="jobLeft">
+         Source A
+        </label>
+        <select id="jobLeft">
+        </select>
+        <label for="jobRecipe">
+         Saved recipe
+        </label>
+        <select id="jobRecipe">
+        </select>
+       </div>
+       <div>
+        <label for="jobRight">
+         Source B
+        </label>
+        <select id="jobRight">
+        </select>
+        <label for="jobInterval">
+         Run every
+        </label>
+        <div class="row">
+         <input id="jobInterval" min="1" style="width:100px" type="number" value="60"/>
+         <select aria-label="Interval unit" id="jobUnit">
+          <option value="1">
+           seconds
+          </option>
+          <option value="60">
+           minutes
+          </option>
+          <option value="3600">
+           hours
+          </option>
+          <option value="86400">
+           days
+          </option>
+         </select>
+        </div>
+        <p class="muted">
+         15 seconds minimum for the demo. Use 1 day for a daily job.
+        </p>
+       </div>
+      </div>
+      <div class="actions">
+       <button id="createJob">
+        Create &amp; start job
+       </button>
+       <button class="secondary" disabled="" hidden="" id="updateJob">
+        Save job changes
+       </button>
+       <button class="secondary" id="useCurrentFiles">
+        Use current comparison sources
+       </button>
+      </div>
+      <p class="muted" id="jobMessage" role="status">
+      </p>
+      <button class="secondary" id="cancelJob" type="button">
+       Cancel
+      </button>
+     </details>
+     <div class="scroll">
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Job / interval
+         </th>
+         <th>
+          Next run
+         </th>
+         <th>
+          Latest result
+         </th>
+         <th>
+          Actions
+         </th>
+        </tr>
+       </thead>
+       <tbody id="jobRows">
+        <tr>
+         <td colspan="4">
+          No scheduled jobs yet.
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </section>
+   </section>
+   <section aria-labelledby="tab-history" class="tab-panel" hidden="" id="panel-history" role="tabpanel">
+    <div class="page-heading">
+     <div>
+      <p class="eyebrow">
+       WORKSPACE / RUN HISTORY
+      </p>
+      <h1>
+       Run history
+      </h1>
+      <p>
+       Every completed run keeps its original sources, rules, and results.
+      </p>
+     </div>
+     <button class="secondary" id="refreshHistory">
+      Refresh history
+     </button>
+    </div>
+    <div class="card history-list">
+     <div class="scroll">
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Run
+         </th>
+         <th>
+          Completed
+         </th>
+         <th>
+          Matched
+         </th>
+         <th>
+          Exceptions
+         </th>
+         <th>
+          Actions
+         </th>
+        </tr>
+       </thead>
+       <tbody id="historyList">
+        <tr>
+         <td class="empty-cell" colspan="5">
+          No completed runs yet.
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+     <select aria-label="Completed runs" hidden="" id="runHistory">
+     </select>
+     <button hidden="" id="openRun">
+      Open saved run
+     </button>
+    </div>
+    <section aria-label="Saved reconciliation report" class="card hidden" id="historyReport">
+     <div class="section-heading">
+      <div>
+       <span class="eyebrow">
+        SAVED REPORT
+       </span>
+       <h2 id="historyTitle" tabindex="-1">
+       </h2>
+       <p class="muted" id="historyMeta">
+       </p>
+      </div>
+      <a class="button secondary" id="historyDownload">
+       Export CSV
+      </a>
+     </div>
+     <p class="muted" id="historyAccounting">
+     </p>
+     <div class="stats" id="historyStats">
+     </div>
+     <label for="historyFilter">
+      Filter saved report
+     </label>
+     <select id="historyFilter">
+      <option value="all">
+       All results
+      </option>
+     </select>
+     <div class="scroll">
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Reference
+         </th>
+         <th>
+          Result
+         </th>
+         <th>
+          Differences
+         </th>
+         <th>
+          Source records
+         </th>
+        </tr>
+       </thead>
+       <tbody id="historyRows">
+       </tbody>
+      </table>
+     </div>
+    </section>
+   </section>
+   <section aria-labelledby="tab-data" class="tab-panel" hidden="" id="panel-data" role="tabpanel">
+    <div class="page-heading">
+     <div>
+      <p class="eyebrow">
+       WORKSPACE / DATA SOURCES
+      </p>
+      <h1>
+       Data sources
+      </h1>
+      <p>
+       Your saved files and database connections, ready for the next comparison.
+      </p>
+     </div>
+    </div>
+    <section class="card">
+     <h2>
+      Available sources
+     </h2>
+     <div class="source-inventory" id="sourceInventory">
+      Loading saved sources…
+     </div>
+    </section>
+    <section class="card" id="databaseSources">
+     <div class="row" style="justify-content:space-between">
+      <h2>
+       Connections &amp; live tables
+      </h2>
+      <button class="secondary" id="refreshSources">
+       Refresh sources
+      </button>
+     </div>
+     <p>
+      Manage access once. Your jobs read fresh records without uploading new files.
+     </p>
+     <p class="muted" id="sourceMessage" role="status">
+     </p>
+     <details>
+      <summary>
+       1 · Connect a Supabase database
+      </summary>
+      <p class="muted">
+       Use a dedicated SELECT-only database role. The session-pooler host is recommended. Credentials stay encrypted on the server and are never sent through MCP.
+      </p>
+      <div class="grid">
+       <div>
+        <label for="connectionName">
+         Connection name
+        </label>
+        <input id="connectionName" value="Employee audit database"/>
+        <label for="dbHost">
+         Supabase database / pooler host
+        </label>
+        <input id="dbHost" placeholder="aws-0-region.pooler.supabase.com"/>
+        <label for="dbUser">
+         Database username
+        </label>
+        <input autocomplete="off" id="dbUser" placeholder="reconcile_reader.project-ref"/>
+        <label for="dbPassword">
+         Database password
+        </label>
+        <input autocomplete="new-password" id="dbPassword" type="password"/>
+       </div>
+       <div>
+        <label for="dbPort">
+         Port
+        </label>
+        <select id="dbPort">
+         <option>
+          5432
+         </option>
+         <option>
+          6543
+         </option>
+        </select>
+        <label for="dbName">
+         Database
+        </label>
+        <input id="dbName" value="postgres"/>
+        <label for="dbSchema">
+         Schema
+        </label>
+        <input id="dbSchema" value="reconcile_demo"/>
+       </div>
+      </div>
+      <p>
+       <button id="connectDatabase">
+        Test &amp; save connection
+       </button>
+      </p>
+     </details>
+     <details>
+      <summary>
+       2 · Register a live table
+      </summary>
+      <div class="grid">
+       <div>
+        <label for="sourceConnection">
+         Connection
+        </label>
+        <select id="sourceConnection">
+        </select>
+        <label for="sourceTable">
+         Table
+        </label>
+        <select id="sourceTable">
+        </select>
+        <label for="sourceLabel">
+         Source name
+        </label>
+        <input id="sourceLabel" placeholder="Live employee expenses"/>
+        <label for="sourceColumns">
+         Columns (Ctrl-click to select several; primary key is always included)
+        </label>
+        <select id="sourceColumns" multiple="" size="6" style="width:100%">
+        </select>
+       </div>
+       <div>
+        <label for="sourceDateColumn">
+         Optional date filter column
+        </label>
+        <select id="sourceDateColumn">
+        </select>
+        <label for="sourceDateFrom">
+         From (inclusive)
+        </label>
+        <input id="sourceDateFrom" type="date"/>
+        <label for="sourceDateTo">
+         Through (inclusive)
+        </label>
+        <input id="sourceDateTo" type="date"/>
+        <p class="muted">
+         Tables need a primary key. Register two tables from the same connection for a consistent snapshot.
+        </p>
+       </div>
+      </div>
+      <p>
+       <button id="saveSource">
+        Save live source
+       </button>
+      </p>
+     </details>
+    </section>
+   </section>
+   <section aria-labelledby="tab-notifications" class="tab-panel" hidden="" id="panel-notifications" role="tabpanel">
+    <div class="page-heading">
+     <div>
+      <p class="eyebrow">
+       WORKSPACE / NOTIFICATIONS
+      </p>
+      <h1>
+       Notifications
+      </h1>
+      <p>
+       Track completed checks, new discrepancies, and failures.
+      </p>
+     </div>
+    </div>
+    <section class="card" id="notificationPanel" style="max-width:none;margin-top:20px">
+     <h2 id="notificationHeading" style="cursor:pointer;font-weight:600">
+      Job notifications
+     </h2>
+     <p class="muted">
+      Each event links to its saved result or records why the check failed.
+     </p>
+     <p class="muted" id="subscriptionStatus">
+      Checking assistant subscriptions…
+     </p>
+     <p aria-live="polite" class="muted" id="runOpenStatus" role="status">
+     </p>
+     <div class="muted" id="jobEvents">
+      No job events yet.
+     </div>
+     <div class="row">
+      <button class="secondary" id="notificationsPrev">
+       Previous notifications
+      </button>
+      <span class="muted" id="notificationsPage">
+      </span>
+      <button class="secondary" id="notificationsNext">
+       Next notifications
+      </button>
+      <label>
+       Per page
+       <select id="notificationsSize">
+        <option>
+         5
+        </option>
+        <option>
+         10
+        </option>
+        <option>
+         20
+        </option>
+       </select>
+      </label>
+     </div>
+    </section>
+   </section>
+  </main>
+  <dialog aria-labelledby="resetTitle" id="resetDialog">
+   <form method="dialog">
+    <div class="section-heading">
+     <h2 id="resetTitle">
+      Reset demo data?
+     </h2>
+     <button aria-label="Close reset dialog" class="icon-button" value="cancel">
+      ×
+     </button>
+    </div>
+   </form>
+   <p>
+    This clears generated records from your workspace. A recovery archive lets you undo the last reset.
+   </p>
+   <div class="reset-counts" id="resetCounts">
+   </div>
+   <div class="retained-note">
+    <b>
+     Your setup stays connected.
+    </b>
+    <p>
+     Database connections, live table definitions, saved recipes, and sign-in are kept. Your actual Supabase tables are unchanged.
+    </p>
+   </div>
+   <p id="resetStatus" role="status">
+   </p>
+   <div class="dialog-actions">
+    <button class="secondary" id="cancelReset">
+     Cancel
+    </button>
+    <button class="danger" id="confirmReset">
+     Reset demo data
+    </button>
+   </div>
+  </dialog>
+  <script defer="" src="/assets/workspace.js">
+  </script>
+  <script defer="" src="/assets/live.js">
+  </script>
+  <script defer="" src="/assets/shell.js">
+  </script>
+ </body>
+</html>

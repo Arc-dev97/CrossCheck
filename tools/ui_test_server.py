@@ -49,5 +49,5 @@ server.oauth.google.authorize_redirect=mock_redirect
 server.oauth.google.authorize_access_token=mock_token
 if __name__=='__main__':
     import uvicorn
-    try:uvicorn.run(server.app,host='127.0.0.1',port=8001)
+    try:uvicorn.run(server.app,host='127.0.0.1',port=8001,access_log=False)
     finally:workspace.cleanup()

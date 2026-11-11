@@ -113,27 +113,29 @@ class EventHub:
                 for event in reversed(self.b.listing('event')):
                     args=sub['arguments']
                     if event['created_at']<sub['since'] or (args.get('job_id') and args['job_id']!=event['job_id']) or (args.get('statuses') and event['status']not in args['statuses']):continue
-                    key=sub['id']+':'+event['id'];state=self.store.read('delivery',key) or {'attempts':0,'next_at':0}
-                    if state.get('done') or state['next_at']>time.time():continue
-                    if attempted>=5:return
-                    # Re-check immediately before every delivery, including pending retries.
-                    current=self.store.read('subscription',sub['id'])
-                    if not current or not self.active(current):break
-                    sub=current
-                    payload={'eventId':event['id'],'name':EVENT,'timestamp':event['created_at'],'data':{k:event.get(k) for k in ('job_id','job_name','status','run_id','summary','error')}|{'url':self.b.public_base_url+'/#scheduled'},'cursor':None}
-                    body=json.dumps(payload,separators=(',',':')).encode()
-                    try:
-                        if len(body)>262144:raise ValueError('Event exceeds 256 KiB.')
-                        status,_=self.send(sub['url'],self.unprotect(sub['secret']),event['id'],body,sub['id'],self.unprotect(sub['old_secret']) if sub.get('old_secret_until',0)>time.time() else None)
-                        accepted=200<=status<300
-                    except Exception:status=0;accepted=False
-                    attempted+=1;attempts=state['attempts']+1;done=accepted or attempts>=5 or status in (400,401,403,404,410,413)
-                    state={'attempts':attempts,'next_at':time.time()+min(5*2**attempts,300),'done':done,'status':status,'accepted':accepted}
-                    self.store.put('delivery',key,state)
-                    previous=event.get('delivery_status')
-                    # Never downgrade an event already accepted by another subscribed destination.
-                    result='accepted' if accepted or previous=='accepted' else ('failed' if done else 'retrying')
-                    self.update_event(event,{'delivery_status':result,'delivery_attempts':attempts,'message':'Webhook accepted; assistant processing is asynchronous.' if accepted else 'Webhook delivery failed.' if done else 'Webhook delivery will retry.'})
+                    with self.b.workspace.delivery_guard(event['id']) as alive:
+                        if not alive:continue
+                        key=sub['id']+':'+event['id'];state=self.store.read('delivery',key) or {'attempts':0,'next_at':0}
+                        if state.get('done') or state['next_at']>time.time():continue
+                        if attempted>=5:return
+                        # Re-check immediately before every delivery, including pending retries.
+                        current=self.store.read('subscription',sub['id'])
+                        if not current or not self.active(current):break
+                        sub=current
+                        payload={'eventId':event['id'],'name':EVENT,'timestamp':event['created_at'],'data':{k:event.get(k) for k in ('job_id','job_name','status','run_id','summary','error')}|{'url':self.b.public_base_url+'/#scheduled'},'cursor':None}
+                        body=json.dumps(payload,separators=(',',':')).encode()
+                        try:
+                            if len(body)>262144:raise ValueError('Event exceeds 256 KiB.')
+                            status,_=self.send(sub['url'],self.unprotect(sub['secret']),event['id'],body,sub['id'],self.unprotect(sub['old_secret']) if sub.get('old_secret_until',0)>time.time() else None)
+                            accepted=200<=status<300
+                        except Exception:status=0;accepted=False
+                        attempted+=1;attempts=state['attempts']+1;done=accepted or attempts>=5 or status in (400,401,403,404,410,413)
+                        state={'attempts':attempts,'next_at':time.time()+min(5*2**attempts,300),'done':done,'status':status,'accepted':accepted}
+                        self.store.put('delivery',key,state)
+                        previous=event.get('delivery_status')
+                        # Never downgrade an event already accepted by another subscribed destination.
+                        result='accepted' if accepted or previous=='accepted' else ('failed' if done else 'retrying')
+                        self.update_event(event,{'delivery_status':result,'delivery_attempts':attempts,'message':'Webhook accepted; assistant processing is asynchronous.' if accepted else 'Webhook delivery failed.' if done else 'Webhook delivery will retry.'})
             finally:owner_context.reset(token)
 
 class EventGateway:

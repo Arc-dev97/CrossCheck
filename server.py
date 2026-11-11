@@ -39,13 +39,15 @@ from app.models import *
 from app.sources import snapshot_data, install_sources
 from app.repositories import install_repositories
 
-app=FastAPI(title='Reconcile workspace',version='0.3.0')
+app=FastAPI(title='CrossCheck workspace',version='0.3.0')
 import sys
 install_auth(app,sys.modules[__name__])
 from app.mcp_oauth import install_oauth
 install_oauth(app,sys.modules[__name__])
 sources=install_sources(app,sys.modules[__name__])
 repositories=install_repositories(app,sys.modules[__name__])
+from app.workspace import install_workspace
+workspace=install_workspace(app,sys.modules[__name__])
 @app.middleware('http')
 async def local_only(request: Request, call_next):
     # Single-user local workspace; reject cross-site browser mutation requests.
@@ -65,6 +67,12 @@ async def value_error(request,exc): return JSONResponse({'error':str(exc)},statu
 def home(request:Request): return FileResponse(ROOT/('app/index.html' if request.state.user else 'app/login.html'))
 @app.get('/assets/live.js')
 def live_script():return FileResponse(ROOT/'app/live.js',media_type='text/javascript')
+
+@app.get('/assets/{name}')
+def frontend_asset(name:str):
+    allowed={'workspace.js':'text/javascript','workspace.css':'text/css','shell.js':'text/javascript','bricolage-latin.woff2':'font/woff2','FONT_LICENSE.txt':'text/plain'}
+    if name not in allowed:raise HTTPException(404)
+    return FileResponse(ROOT/'app'/name,media_type=allowed[name])
 
 @app.get('/demo/{name}')
 def demo(name:str):
