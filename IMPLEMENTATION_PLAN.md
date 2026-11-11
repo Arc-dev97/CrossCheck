@@ -26,7 +26,7 @@ Status is updated as work is verified. No permanent app deployment is authorized
 - [x] Add bounded read-only GitHub file/branch-diff access; resolve branch reads to commit SHAs.
 - [x] Associate repositories with jobs and include code provenance in diagnostic evidence.
 - [x] Prepare a synthetic source-update script with a controlled amount-conversion bug.
-- [ ] Verify real repositories after URLs/access are provided. Publishing requires an explicit destination.
+- [x] Verify real repositories after URLs/access are provided. Publishing requires an explicit destination.
 
 ## 5. Notifications
 - [x] Add a collapsed notifications panel with an event count.
@@ -36,11 +36,11 @@ Status is updated as work is verified. No permanent app deployment is authorized
 ## 6. Verification
 - [x] Run existing regressions.
 - [x] Test source access isolation, secret redaction, query construction, typed conversion, transaction consistency and input limits.
-- [ ] Test fresh scheduled snapshots, immutable history, schema/fetch failures and comparison deltas.
+- [x] Test fresh scheduled snapshots, immutable history, schema/fetch failures and comparison deltas.
 - [x] Test GitHub path/ref restrictions, commit resolution and error handling.
 - [x] Test notification pagination and isolation.
 - [x] Verify the UI in an isolated browser session.
-- [ ] Verify actual Supabase integration when project access is configured; report pending external setup honestly.
+- [x] Verify actual Supabase integration when project access is configured; report pending external setup honestly.
 
 ## External setup
 Supabase project qiejcpkceecwhhdnxvll was created through the signed-in dashboard. The interactive local helper configured the SELECT-only connection without exposing the admin password. GitHub destination supplied by user: https://github.com/Arc-dev97/CrossCheck.git . No permanent app hosting deployment is authorized.
@@ -49,4 +49,8 @@ Supabase project qiejcpkceecwhhdnxvll was created through the signed-in dashboar
 - 36 automated tests pass.
 - Browser QA: consistent snapshot loading, numeric preview, a real 15-second timer using fixture tables, pause, notifications collapsed initially, pagination and expanded details.
 - Actual Supabase: verified TLS, 183 source rows, canonical counts and reader UPDATE denied by PostgreSQL.
-- Actual GitHub public API: commit resolution, bounded text file read and branch listing passed against the official GitHub MCP repository. Target repository publication and target-specific reads are next.
+- Actual GitHub public API: commit resolution, bounded text file read and branch listing passed against the official GitHub MCP repository. Target main and demo/minor-unit-bug branches are published; both code contexts are registered and their actual diff is verified.
+
+- Real changing-data timer test: synthetic invoice 338.66 -> 33866 caused matches 71 -> 70, mismatches 12 -> 13 and one new discrepancy. Restoring 338.66 produced one resolved discrepancy and the canonical counts. The job is paused and the source value restored.
+- Public HTTPS MCP protocol test discovered 16 tools, verified event discovery, rejected invalid bearer tokens and revoked the synthetic test grant.
+- ChatGPT Refresh tools succeeded; its UI lists all 16 tools.

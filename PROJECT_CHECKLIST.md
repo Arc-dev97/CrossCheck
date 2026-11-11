@@ -155,3 +155,15 @@ Live test note: both app demo jobs are paused. ChatGPT confirmed the native task
 
 - [x] Stop test monitoring and independently verify the persisted subscription is inactive.
 - [x] Restart the current public demo server with validated code; retain the same tunnel URL.
+
+## Live tables and code-aware diagnosis
+- [x] Tracked implementation: IMPLEMENTATION_PLAN.md.
+- [x] Supabase demo project, seeded 183 rows and encrypted SELECT-only connection.
+- [x] Fresh, consistent live-table snapshots on scheduled runs; old runs immutable.
+- [x] Failure stages, code/source provenance and discrepancy changes.
+- [x] Application and pipeline repository contexts with bounded file/branch reads.
+- [x] Publish main and isolated demo/minor-unit-bug to the supplied CrossCheck repository.
+- [x] Collapsed notifications with server-side pagination and expandable entries.
+- [x] 36 automated tests, browser QA, real Supabase/permissions test, real changing-data timer test and actual GitHub branch-diff test.
+- [x] 16 tools verified through public MCP and refreshed in ChatGPT.
+- [ ] Automatic ChatGPT event-generated messages remain unverified; this upgrade does not claim a fix.

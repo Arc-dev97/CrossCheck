@@ -55,3 +55,8 @@ The public protocol smoke test in tools/verify_public_mcp.py uses a separate syn
 - https://developers.openai.com/plugins/build/mcp-events
 - https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp
 - https://code.claude.com/docs/en/channels
+
+## Live-source and GitHub upgrade
+The server now exposes 16 tools. Added: list_database_sources, snapshot_database_sources, inspect_job_diagnostics, list_code_repositories, inspect_repository_file, list_repository_branches, compare_repository_branches. ChatGPT Refresh tools was completed and all 16 appear in the connected app UI. Public HTTPS discovery/authentication checks passed. Both application and source-pipeline contexts point to the user-supplied CrossCheck repository, with separate allowed paths. Source snapshots are fresh at each database job execution; final manual execution remains in the website. See LIVE_SOURCES_SETUP.md for configuration and a diagnostic prompt.
+
+Verification now includes 36 automated tests, actual SELECT-only Supabase reads/write rejection, actual source-change/correction timer runs, and a verified diff against demo/minor-unit-bug. Automatic event-generated ChatGPT replies remain unverified.

@@ -40,3 +40,6 @@ Rescan/reconnect the ChatGPT custom MCP plugin after the server's tool list chan
 
 ## Notifications
 The panel is collapsed initially. Open Job notifications to see its count and page controls; each notification expands independently. Server pagination is scoped to the signed-in user. Webhook accepted means receipt was acknowledged; it does not prove ChatGPT generated a reply. Automatic ChatGPT replies remain independently unverified.
+
+## Verified current demo state
+The project is configured and the live job is saved as Live employee audit — Supabase, paused at a 30-second interval. Both code contexts are attached. Timer runs detected a synthetic invoice changing from 338.66 to 33866 (one new discrepancy; 13 mismatches) and back (one resolved discrepancy; 12 mismatches). The original value is restored. Both main and demo/minor-unit-bug are available on GitHub. The bug branch is intentionally incorrect; main is the active checkout. The running application records commit 4d146db363975d14eadda828b502fb4fea42ed25 plus its source fingerprint; later documentation-only commits do not change that deployed code.

@@ -28,7 +28,7 @@ Inventory: 62 + 61 rows. Employee audit: 92 + 91 rows, 15 synthetic employees. S
 
 See MCP_CONNECTIONS.md and CURRENT_CONNECTION.md. Standard MCP tools, remote OAuth, native MCP Events subscriptions and signed webhook delivery are implemented. Real ChatGPT OAuth, tool reads, editable draft creation, event subscription and HTTP-accepted delivery have been tested. The generated automatic task response is still being verified; do not conflate webhook acceptance with a visible ChatGPT notification. Claude account testing is deferred at user request. Claude Code Channels is not implemented.
 
-An authorized temporary HTTPS tunnel proxies to the updated app on port 8002. The original localhost:8000 process may still serve the previous build. Use the HTTPS endpoint for the current integration demo. No permanent deployment has been made.
+An authorized temporary HTTPS tunnel proxies to the updated app on port 8002. The stale localhost:8000 process was stopped during the live-source upgrade. Use the HTTPS endpoint for the current integration demo. No permanent deployment has been made.
 
 ## Limitations
 
