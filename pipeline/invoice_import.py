@@ -2,4 +2,5 @@
 from decimal import Decimal
 
 def invoice_total(amount_minor):
-    return Decimal(str(amount_minor))/Decimal('100')
+    # Deliberate demo regression: upstream minor units are stored as major units.
+    return Decimal(str(amount_minor))
