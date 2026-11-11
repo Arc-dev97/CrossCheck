@@ -1,0 +1,93 @@
+expense_id,employee_id,employee_name,department,cost_center,expense_date,merchant,category,claimed_amount,currency,receipt_number,project_code,payment_method,manager,submission_status,business_purpose
+EXP-2026-0001,EMP-101,Aarav Mehta,Sales,CC-11,2026-10-02,Metro Cabs,Travel,338.66,INR,BILL-00001,PRJ-201,Personal card,Manager 1,Submitted,Client visit
+EXP-2026-0002,EMP-101,Aarav Mehta,Sales,CC-12,2026-10-03,City Business Hotel,Accommodation,382.32,INR,BILL-00002,PRJ-202,Corporate card,Manager 1,Submitted,Accommodation for project delivery
+EXP-2026-0003,EMP-101,Aarav Mehta,Sales,CC-13,2026-10-04,CloudTools India,Software,425.98,INR,BILL-00003,PRJ-203,Personal card,Manager 1,Submitted,Software for project delivery
+EXP-2026-0004,EMP-101,Aarav Mehta,Sales,CC-14,2026-10-05,Office Supply Co,Office supplies,469.64,INR,BILL-00004,PRJ-200,Corporate card,Manager 1,Submitted,Office supplies for project delivery
+EXP-2026-0005,EMP-101,Aarav Mehta,Sales,CC-10,2026-10-06,Client Bistro,Client meals,513.30,INR,BILL-00005,PRJ-201,Personal card,Manager 1,Submitted,Client meals for project delivery
+EXP-2026-0006,EMP-101,Aarav Mehta,Sales,CC-11,2026-10-07,Rail Services,Travel,556.96,INR,BILL-00006,PRJ-202,Corporate card,Manager 1,Submitted,Client visit
+EXP-2026-0007,EMP-102,Priya Nair,Engineering,CC-12,2026-10-08,Metro Cabs,Travel,600.62,INR,BILL-00007,PRJ-203,Personal card,Manager 1,Submitted,Client visit
+EXP-2026-0008,EMP-102,Priya Nair,Engineering,CC-13,2026-10-09,City Business Hotel,Accommodation,644.28,INR,BILL-00008,PRJ-200,Corporate card,Manager 1,Submitted,Accommodation for project delivery
+EXP-2026-0009,EMP-102,Priya Nair,Engineering,CC-14,2026-10-10,CloudTools India,Software,687.94,INR,BILL-00009,PRJ-201,Personal card,Manager 1,Submitted,Software for project delivery
+EXP-2026-0010,EMP-102,Priya Nair,Engineering,CC-10,2026-10-11,Office Supply Co,Office supplies,731.60,INR,BILL-00010,PRJ-202,Corporate card,Manager 1,Submitted,Office supplies for project delivery
+EXP-2026-0011,EMP-102,Priya Nair,Engineering,CC-11,2026-10-12,Client Bistro,Client meals,775.26,INR,BILL-00011,PRJ-203,Personal card,Manager 1,Submitted,Client meals for project delivery
+EXP-2026-0012,EMP-102,Priya Nair,Engineering,CC-12,2026-10-13,Rail Services,Travel,818.92,INR,BILL-00012,PRJ-200,Corporate card,Manager 1,Submitted,Client visit
+EXP-2026-0013,EMP-103,Rohan Shah,Marketing,CC-13,2026-10-14,Metro Cabs,Travel,862.58,INR,BILL-00013,PRJ-201,Personal card,Manager 1,Submitted,Client visit
+EXP-2026-0014,EMP-103,Rohan Shah,Marketing,CC-14,2026-10-15,City Business Hotel,Accommodation,906.24,INR,BILL-00014,PRJ-202,Corporate card,Manager 1,Submitted,Accommodation for project delivery
+EXP-2026-0015,EMP-103,Rohan Shah,Marketing,CC-10,2026-10-16,CloudTools India,Software,949.90,INR,BILL-00015,PRJ-203,Personal card,Manager 1,Submitted,Software for project delivery
+EXP-2026-0016,EMP-103,Rohan Shah,Marketing,CC-11,2026-10-17,Office Supply Co,Office supplies,993.56,INR,BILL-00016,PRJ-200,Corporate card,Manager 1,Submitted,Office supplies for project delivery
+EXP-2026-0017,EMP-103,Rohan Shah,Marketing,CC-12,2026-10-18,Client Bistro,Client meals,1037.22,INR,BILL-00017,PRJ-201,Personal card,Manager 1,Submitted,Client meals for project delivery
+EXP-2026-0018,EMP-103,Rohan Shah,Marketing,CC-13,2026-10-19,Rail Services,Travel,1080.88,INR,BILL-00018,PRJ-202,Corporate card,Manager 1,Submitted,Client visit
+EXP-2026-0019,EMP-104,Ananya Rao,Operations,CC-14,2026-10-20,Metro Cabs,Travel,1124.54,INR,BILL-00019,PRJ-203,Personal card,Manager 2,Submitted,Client visit
+EXP-2026-0020,EMP-104,Ananya Rao,Operations,CC-10,2026-10-21,City Business Hotel,Accommodation,1168.20,INR,BILL-00020,PRJ-200,Corporate card,Manager 2,Submitted,Accommodation for project delivery
+EXP-2026-0021,EMP-104,Ananya Rao,Operations,CC-11,2026-10-22,CloudTools India,Software,1211.86,INR,BILL-00021,PRJ-201,Personal card,Manager 2,Submitted,Software for project delivery
+EXP-2026-0022,EMP-104,Ananya Rao,Operations,CC-12,2026-10-23,Office Supply Co,Office supplies,1255.52,INR,BILL-00022,PRJ-202,Corporate card,Manager 2,Submitted,Office supplies for project delivery
+EXP-2026-0023,EMP-104,Ananya Rao,Operations,CC-13,2026-10-24,Client Bistro,Client meals,1299.18,INR,BILL-00023,PRJ-203,Personal card,Manager 2,Submitted,Client meals for project delivery
+EXP-2026-0024,EMP-104,Ananya Rao,Operations,CC-14,2026-10-25,Rail Services,Travel,1342.84,INR,BILL-00024,PRJ-200,Corporate card,Manager 2,Submitted,Client visit
+EXP-2026-0025,EMP-105,Kabir Singh,Sales,CC-10,2026-10-26,Metro Cabs,Travel,1386.50,INR,BILL-00025,PRJ-201,Personal card,Manager 2,Submitted,Client visit
+EXP-2026-0026,EMP-105,Kabir Singh,Sales,CC-11,2026-10-27,City Business Hotel,Accommodation,1430.16,INR,BILL-00026,PRJ-202,Corporate card,Manager 2,Submitted,Accommodation for project delivery
+EXP-2026-0027,EMP-105,Kabir Singh,Sales,CC-12,2026-10-28,CloudTools India,Software,1473.82,INR,BILL-00027,PRJ-203,Personal card,Manager 2,Submitted,Software for project delivery
+EXP-2026-0028,EMP-105,Kabir Singh,Sales,CC-13,2026-10-01,Office Supply Co,Office supplies,1517.48,INR,BILL-00028,PRJ-200,Corporate card,Manager 2,Submitted,Office supplies for project delivery
+EXP-2026-0029,EMP-105,Kabir Singh,Sales,CC-14,2026-10-02,Client Bistro,Client meals,1561.14,INR,BILL-00029,PRJ-201,Personal card,Manager 2,Submitted,Client meals for project delivery
+EXP-2026-0030,EMP-105,Kabir Singh,Sales,CC-10,2026-10-03,Rail Services,Travel,1604.80,INR,BILL-00030,PRJ-202,Corporate card,Manager 2,Submitted,Client visit
+EXP-2026-0031,EMP-106,Meera Iyer,Finance,CC-11,2026-10-04,Metro Cabs,Travel,1648.46,INR,BILL-00031,PRJ-203,Personal card,Manager 2,Submitted,Client visit
+EXP-2026-0032,EMP-106,Meera Iyer,Finance,CC-12,2026-10-05,City Business Hotel,Accommodation,1692.12,INR,BILL-00032,PRJ-200,Corporate card,Manager 2,Submitted,Accommodation for project delivery
+EXP-2026-0033,EMP-106,Meera Iyer,Finance,CC-13,2026-10-06,CloudTools India,Software,1735.78,INR,BILL-00033,PRJ-201,Personal card,Manager 2,Submitted,Software for project delivery
+EXP-2026-0034,EMP-106,Meera Iyer,Finance,CC-14,2026-10-07,Office Supply Co,Office supplies,1779.44,INR,BILL-00034,PRJ-202,Corporate card,Manager 2,Submitted,Office supplies for project delivery
+EXP-2026-0035,EMP-106,Meera Iyer,Finance,CC-10,2026-10-08,Client Bistro,Client meals,1823.10,INR,BILL-00035,PRJ-203,Personal card,Manager 2,Submitted,Client meals for project delivery
+EXP-2026-0036,EMP-106,Meera Iyer,Finance,CC-11,2026-10-09,Rail Services,Travel,1866.76,INR,BILL-00036,PRJ-200,Corporate card,Manager 2,Submitted,Client visit
+EXP-2026-0037,EMP-107,Dev Patel,Engineering,CC-12,2026-10-10,Metro Cabs,Travel,1910.42,INR,BILL-00037,PRJ-201,Personal card,Manager 3,Submitted,Client visit
+EXP-2026-0038,EMP-107,Dev Patel,Engineering,CC-13,2026-10-11,City Business Hotel,Accommodation,1954.08,INR,BILL-00038,PRJ-202,Corporate card,Manager 3,Submitted,Accommodation for project delivery
+EXP-2026-0039,EMP-107,Dev Patel,Engineering,CC-14,2026-10-12,CloudTools India,Software,1997.74,INR,BILL-00039,PRJ-203,Personal card,Manager 3,Submitted,Software for project delivery
+EXP-2026-0040,EMP-107,Dev Patel,Engineering,CC-10,2026-10-13,Office Supply Co,Office supplies,2041.40,INR,BILL-00040,PRJ-200,Corporate card,Manager 3,Submitted,Office supplies for project delivery
+EXP-2026-0041,EMP-107,Dev Patel,Engineering,CC-11,2026-10-14,Client Bistro,Client meals,2085.06,INR,BILL-00041,PRJ-201,Personal card,Manager 3,Submitted,Client meals for project delivery
+EXP-2026-0042,EMP-107,Dev Patel,Engineering,CC-12,2026-10-15,Rail Services,Travel,2128.72,INR,BILL-00042,PRJ-202,Corporate card,Manager 3,Submitted,Client visit
+EXP-2026-0043,EMP-108,Isha Gupta,People,CC-13,2026-10-16,Metro Cabs,Travel,2172.38,INR,BILL-00043,PRJ-203,Personal card,Manager 3,Submitted,Client visit
+EXP-2026-0044,EMP-108,Isha Gupta,People,CC-14,2026-10-17,City Business Hotel,Accommodation,2216.04,INR,BILL-00044,PRJ-200,Corporate card,Manager 3,Submitted,Accommodation for project delivery
+EXP-2026-0045,EMP-108,Isha Gupta,People,CC-10,2026-10-18,CloudTools India,Software,2259.70,INR,BILL-00045,PRJ-201,Personal card,Manager 3,Submitted,Software for project delivery
+EXP-2026-0046,EMP-108,Isha Gupta,People,CC-11,2026-10-19,Office Supply Co,Office supplies,2303.36,INR,BILL-00046,PRJ-202,Corporate card,Manager 3,Submitted,Office supplies for project delivery
+EXP-2026-0047,EMP-108,Isha Gupta,People,CC-12,2026-10-20,Client Bistro,Client meals,2347.02,INR,BILL-00047,PRJ-203,Personal card,Manager 3,Submitted,Client meals for project delivery
+EXP-2026-0048,EMP-108,Isha Gupta,People,CC-13,2026-10-21,Rail Services,Travel,2390.68,INR,BILL-00048,PRJ-200,Corporate card,Manager 3,Submitted,Client visit
+EXP-2026-0049,EMP-109,Arjun Das,Customer Success,CC-14,2026-10-22,Metro Cabs,Travel,2434.34,INR,BILL-00049,PRJ-201,Personal card,Manager 3,Submitted,Client visit
+EXP-2026-0050,EMP-109,Arjun Das,Customer Success,CC-10,2026-10-23,City Business Hotel,Accommodation,2478.00,INR,BILL-00050,PRJ-202,Corporate card,Manager 3,Submitted,Accommodation for project delivery
+EXP-2026-0051,EMP-109,Arjun Das,Customer Success,CC-11,2026-10-24,CloudTools India,Software,2521.66,INR,BILL-00051,PRJ-203,Personal card,Manager 3,Submitted,Software for project delivery
+EXP-2026-0052,EMP-109,Arjun Das,Customer Success,CC-12,2026-10-25,Office Supply Co,Office supplies,2565.32,INR,BILL-00052,PRJ-200,Corporate card,Manager 3,Submitted,Office supplies for project delivery
+EXP-2026-0053,EMP-109,Arjun Das,Customer Success,CC-13,2026-10-26,Client Bistro,Client meals,2608.98,INR,BILL-00053,PRJ-201,Personal card,Manager 3,Submitted,Client meals for project delivery
+EXP-2026-0054,EMP-109,Arjun Das,Customer Success,CC-14,2026-10-27,Rail Services,Travel,2652.64,INR,BILL-00054,PRJ-202,Corporate card,Manager 3,Submitted,Client visit
+EXP-2026-0055,EMP-110,Sara Khan,Marketing,CC-10,2026-10-28,Metro Cabs,Travel,2696.30,INR,BILL-00055,PRJ-203,Personal card,Manager 4,Submitted,Client visit
+EXP-2026-0056,EMP-110,Sara Khan,Marketing,CC-11,2026-10-01,City Business Hotel,Accommodation,2739.96,INR,BILL-00056,PRJ-200,Corporate card,Manager 4,Submitted,Accommodation for project delivery
+EXP-2026-0057,EMP-110,Sara Khan,Marketing,CC-12,2026-10-02,CloudTools India,Software,2783.62,INR,BILL-00057,PRJ-201,Personal card,Manager 4,Submitted,Software for project delivery
+EXP-2026-0058,EMP-110,Sara Khan,Marketing,CC-13,2026-10-03,Office Supply Co,Office supplies,2827.28,INR,BILL-00058,PRJ-202,Corporate card,Manager 4,Submitted,Office supplies for project delivery
+EXP-2026-0059,EMP-110,Sara Khan,Marketing,CC-14,2026-10-04,Client Bistro,Client meals,2870.94,INR,BILL-00059,PRJ-203,Personal card,Manager 4,Submitted,Client meals for project delivery
+EXP-2026-0060,EMP-110,Sara Khan,Marketing,CC-10,2026-10-05,Rail Services,Travel,2914.60,INR,BILL-00060,PRJ-200,Corporate card,Manager 4,Submitted,Client visit
+EXP-2026-0061,EMP-111,Vikram Joshi,Operations,CC-11,2026-10-06,Metro Cabs,Travel,2958.26,INR,BILL-00061,PRJ-201,Personal card,Manager 4,Submitted,Client visit
+EXP-2026-0062,EMP-111,Vikram Joshi,Operations,CC-12,2026-10-07,City Business Hotel,Accommodation,3001.92,INR,BILL-00062,PRJ-202,Corporate card,Manager 4,Submitted,Accommodation for project delivery
+EXP-2026-0063,EMP-111,Vikram Joshi,Operations,CC-13,2026-10-08,CloudTools India,Software,3045.58,INR,BILL-00063,PRJ-203,Personal card,Manager 4,Submitted,Software for project delivery
+EXP-2026-0064,EMP-111,Vikram Joshi,Operations,CC-14,2026-10-09,Office Supply Co,Office supplies,3089.24,INR,BILL-00064,PRJ-200,Corporate card,Manager 4,Submitted,Office supplies for project delivery
+EXP-2026-0065,EMP-111,Vikram Joshi,Operations,CC-10,2026-10-10,Client Bistro,Client meals,3132.90,INR,BILL-00065,PRJ-201,Personal card,Manager 4,Submitted,Client meals for project delivery
+EXP-2026-0066,EMP-111,Vikram Joshi,Operations,CC-11,2026-10-11,Rail Services,Travel,3176.56,INR,BILL-00066,PRJ-202,Corporate card,Manager 4,Submitted,Client visit
+EXP-2026-0067,EMP-112,Neha Kapoor,Sales,CC-12,2026-10-12,Metro Cabs,Travel,3220.22,INR,BILL-00067,PRJ-203,Personal card,Manager 4,Submitted,Client visit
+EXP-2026-0068,EMP-112,Neha Kapoor,Sales,CC-13,2026-10-13,City Business Hotel,Accommodation,3263.88,INR,BILL-00068,PRJ-200,Corporate card,Manager 4,Submitted,Accommodation for project delivery
+EXP-2026-0069,EMP-112,Neha Kapoor,Sales,CC-14,2026-10-14,CloudTools India,Software,3307.54,INR,BILL-00069,PRJ-201,Personal card,Manager 4,Submitted,Software for project delivery
+EXP-2026-0070,EMP-112,Neha Kapoor,Sales,CC-10,2026-10-15,Office Supply Co,Office supplies,3351.20,INR,BILL-00070,PRJ-202,Corporate card,Manager 4,Submitted,Office supplies for project delivery
+EXP-2026-0071,EMP-112,Neha Kapoor,Sales,CC-11,2026-10-16,Client Bistro,Client meals,3394.86,INR,BILL-00071,PRJ-203,Personal card,Manager 4,Submitted,Client meals for project delivery
+EXP-2026-0072,EMP-112,Neha Kapoor,Sales,CC-12,2026-10-17,Rail Services,Travel,3438.52,INR,BILL-00072,PRJ-200,Corporate card,Manager 4,Submitted,Client visit
+EXP-2026-0073,EMP-113,Aditya Sen,Engineering,CC-13,2026-10-18,Metro Cabs,Travel,3482.18,INR,BILL-00073,PRJ-201,Personal card,Manager 5,Submitted,Client visit
+EXP-2026-0074,EMP-113,Aditya Sen,Engineering,CC-14,2026-10-19,City Business Hotel,Accommodation,3525.84,INR,BILL-00074,PRJ-202,Corporate card,Manager 5,Submitted,Accommodation for project delivery
+EXP-2026-0075,EMP-113,Aditya Sen,Engineering,CC-10,2026-10-20,CloudTools India,Software,3569.50,INR,BILL-00075,PRJ-203,Personal card,Manager 5,Submitted,Software for project delivery
+EXP-2026-0076,EMP-113,Aditya Sen,Engineering,CC-11,2026-10-21,Office Supply Co,Office supplies,3613.16,INR,BILL-00076,PRJ-200,Corporate card,Manager 5,Submitted,Office supplies for project delivery
+EXP-2026-0077,EMP-113,Aditya Sen,Engineering,CC-12,2026-10-22,Client Bistro,Client meals,3656.82,INR,BILL-00077,PRJ-201,Personal card,Manager 5,Submitted,Client meals for project delivery
+EXP-2026-0078,EMP-113,Aditya Sen,Engineering,CC-13,2026-10-23,Rail Services,Travel,3700.48,INR,BILL-00078,PRJ-202,Corporate card,Manager 5,Submitted,Client visit
+EXP-2026-0079,EMP-114,Tara Menon,Product,CC-14,2026-10-24,Metro Cabs,Travel,3744.14,INR,BILL-00079,PRJ-203,Personal card,Manager 5,Submitted,Client visit
+EXP-2026-0080,EMP-114,Tara Menon,Product,CC-10,2026-10-25,City Business Hotel,Accommodation,3787.80,INR,BILL-00080,PRJ-200,Corporate card,Manager 5,Submitted,Accommodation for project delivery
+EXP-2026-0081,EMP-114,Tara Menon,Product,CC-11,2026-10-26,CloudTools India,Software,3831.46,INR,BILL-00081,PRJ-201,Personal card,Manager 5,Submitted,Software for project delivery
+EXP-2026-0082,EMP-114,Tara Menon,Product,CC-12,2026-10-27,Office Supply Co,Office supplies,3875.12,INR,BILL-00082,PRJ-202,Corporate card,Manager 5,Submitted,Office supplies for project delivery
+EXP-2026-0083,EMP-114,Tara Menon,Product,CC-13,2026-10-28,Client Bistro,Client meals,3918.78,INR,BILL-00083,PRJ-203,Personal card,Manager 5,Submitted,Client meals for project delivery
+EXP-2026-0084,EMP-114,Tara Menon,Product,CC-14,2026-10-01,Rail Services,Travel,3962.44,INR,BILL-00084,PRJ-200,Corporate card,Manager 5,Submitted,Client visit
+EXP-2026-0085,EMP-115,Farhan Ali,Customer Success,CC-10,2026-10-02,Metro Cabs,Travel,4006.10,INR,BILL-00085,PRJ-201,Personal card,Manager 5,Submitted,Client visit
+EXP-2026-0086,EMP-115,Farhan Ali,Customer Success,CC-11,2026-10-03,City Business Hotel,Accommodation,4049.76,INR,BILL-00086,PRJ-202,Corporate card,Manager 5,Submitted,Accommodation for project delivery
+EXP-2026-0087,EMP-115,Farhan Ali,Customer Success,CC-12,2026-10-04,CloudTools India,Software,4093.42,INR,BILL-00087,PRJ-203,Personal card,Manager 5,Submitted,Software for project delivery
+EXP-2026-0088,EMP-115,Farhan Ali,Customer Success,CC-13,2026-10-05,Office Supply Co,Office supplies,4137.08,INR,BILL-00088,PRJ-200,Corporate card,Manager 5,Submitted,Office supplies for project delivery
+EXP-2026-0089,EMP-115,Farhan Ali,Customer Success,CC-14,2026-10-06,Client Bistro,Client meals,4180.74,INR,BILL-00089,PRJ-201,Personal card,Manager 5,Submitted,Client meals for project delivery
+EXP-2026-0090,EMP-115,Farhan Ali,Customer Success,CC-10,2026-10-07,Rail Services,Travel,4224.40,INR,BILL-00090,PRJ-202,Corporate card,Manager 5,Submitted,Client visit
+EXP-2026-0020,EMP-104,Ananya Rao,Operations,CC-10,2026-10-21,City Business Hotel,Accommodation,1168.20,INR,BILL-00020,PRJ-200,Corporate card,Manager 2,Submitted,Accommodation for project delivery
+,EMP-101,Aarav Mehta,Sales,CC-10,2026-10-31,Metro Cabs,Travel,1200.00,INR,BILL-MISSING,PRJ-200,Personal card,Manager 1,Submitted,Missing expense identifier

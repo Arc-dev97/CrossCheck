@@ -1,0 +1,20 @@
+{
+  "left_key": "SKU",
+  "right_key": "item_code",
+  "trim": true,
+  "ignore_case": true,
+  "comparisons": [
+    {
+      "left": "Available Units",
+      "right": "stock_count",
+      "type": "number",
+      "tolerance": 0
+    },
+    {
+      "left": "Product Name",
+      "right": "title",
+      "type": "text",
+      "tolerance": 0
+    }
+  ]
+}

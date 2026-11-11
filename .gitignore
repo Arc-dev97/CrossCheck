@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+data/
+
+.env
+.env.*
+!.env.example
+
+tools/bin/
+
+CURRENT_CONNECTION.md
+tools/check-inline.js
+*.pyc
+*.log

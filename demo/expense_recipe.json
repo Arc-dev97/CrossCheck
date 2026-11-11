@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "left_key": "expense_id",
+  "right_key": "claim_reference",
+  "trim": true,
+  "ignore_case": true,
+  "include_missing": true,
+  "comparisons": [
+    {
+      "left": "claimed_amount",
+      "right": "invoice_total",
+      "type": "number",
+      "tolerance": 1
+    },
+    {
+      "left": "employee_id",
+      "right": "submitted_by_id",
+      "type": "text"
+    },
+    {
+      "left": "currency",
+      "right": "currency_code",
+      "type": "text"
+    },
+    {
+      "left": "receipt_number",
+      "right": "invoice_number",
+      "type": "text"
+    },
+    {
+      "left": "merchant",
+      "right": "vendor_name",
+      "type": "text"
+    }
+  ]
+}

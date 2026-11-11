@@ -1,0 +1,9 @@
+{
+  "matched": 43,
+  "mismatch": 8,
+  "invalid_value": 2,
+  "duplicate_key": 2,
+  "invalid_key": 1,
+  "left_only": 5,
+  "right_only": 4
+}

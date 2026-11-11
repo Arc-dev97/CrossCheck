@@ -1,0 +1,4 @@
+SKU,Product Name,Category,Available Units,Reserved Units,Warehouse,Unit Cost,Currency,Supplier,Last Counted,Internal Notes,Legacy Code
+00001,Camera Body Model 1,Video,13,1,BLR-MAIN,14.50,INR,Supplier 1,2026-11-10,,
+00002,,Audio,16,2,BLR-MAIN,16.50,INR,Supplier 2,2026-11-10,,
+00003,Tripod Model 3,Video,19,3,BLR-MAIN,18.50,INR,Supplier 3,2026-11-10,,
