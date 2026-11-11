@@ -54,3 +54,5 @@ Supabase project qiejcpkceecwhhdnxvll was created through the signed-in dashboar
 - Real changing-data timer test: synthetic invoice 338.66 -> 33866 caused matches 71 -> 70, mismatches 12 -> 13 and one new discrepancy. Restoring 338.66 produced one resolved discrepancy and the canonical counts. The job is paused and the source value restored.
 - Public HTTPS MCP protocol test discovered 16 tools, verified event discovery, rejected invalid bearer tokens and revoked the synthetic test grant.
 - ChatGPT Refresh tools succeeded; its UI lists all 16 tools.
+
+- Actual ChatGPT on-demand MCP test passed: retrieved five real live-job runs, inspected scheduler/source-reader implementation, compared the real main/bug branches, cited resolved SHAs, identified the 100x conversion error, and correctly refused to infer upstream deployment without producer SHAs. No app or code changes were made by the assistant.

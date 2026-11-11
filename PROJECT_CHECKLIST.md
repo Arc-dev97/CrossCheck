@@ -167,3 +167,5 @@ Live test note: both app demo jobs are paused. ChatGPT confirmed the native task
 - [x] 36 automated tests, browser QA, real Supabase/permissions test, real changing-data timer test and actual GitHub branch-diff test.
 - [x] 16 tools verified through public MCP and refreshed in ChatGPT.
 - [ ] Automatic ChatGPT event-generated messages remain unverified; this upgrade does not claim a fix.
+
+- [x] Actual ChatGPT read-only cross-codebase investigation verified with real source tables, run history and GitHub commits. This is on-demand diagnosis, not automatic notification verification.
