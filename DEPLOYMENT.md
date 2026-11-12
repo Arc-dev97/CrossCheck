@@ -40,3 +40,13 @@ PostgreSQL transactions and advisory locks retain write serialization, one-use t
 Render Free sleeps after inactivity; scheduled jobs stop while asleep and resume after the service wakes. This is suitable for an interactive demo, not unattended daily monitoring. Supabase project quotas and pause rules also apply. No paid hosting has been authorized.
 
 References: https://render.com/docs/free ; https://render.com/docs/deploy-fastapi ; https://render.com/docs/python-version ; https://www.psycopg.org/psycopg3/docs/basic/transactions.html
+
+## Deployed service
+
+- App: https://crosscheck-demo.onrender.com
+- MCP: https://crosscheck-demo.onrender.com/mcp/
+- Render service: srv-dbqiu06c6qcc73ffrogg, Singapore, Free, no disk or paid plan.
+- Live application commit: e07acd558b0b02c7d1ac930274eb36d96a36a8af. Later verification/docs-only commits do not change that deployed code.
+- Real Google login, retained encrypted Supabase connection/table discovery and migrated workspace access verified.
+- Public MCP and 15-second synthetic scheduled-job checks passed; the synthetic workspace was removed.
+- Separate service restart test was skipped to meet the user's five-minute wrap-up limit. User ChatGPT reconnection to the new origin is still required.

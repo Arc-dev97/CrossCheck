@@ -203,6 +203,7 @@ Validation limits: browser download-event automation timed out (export endpoint 
 - [x] Local regression: 43 tests pass. PostgreSQL API/auth/persistence/export/validation scenarios pass; final reset/undo, compact listings and overlapping-job checks pass.
 - [x] History/source/reset-summary queries measured against migrated data at approximately 2–4 seconds from the local machine.
 - [x] Linux dependency marker and Python version pin; Render Free configuration, no paid disk.
-- [ ] Render deployment and real Google sign-in at the new URL.
-- [ ] Public MCP verification and fresh ChatGPT authorization at the new URL.
-- [ ] Hosted restart and retained connection/state check.
+- [x] Render Free deployment at https://crosscheck-demo.onrender.com and real Google sign-in verified; retained Supabase credentials decrypt and table discovery works.
+- [x] Public MCP verification: all 16 tools, authenticated draft creation, invalid-rule rejection and event discovery; timed job completed automatically. Synthetic workspace and tokens cleaned up.
+- [ ] User reconnects ChatGPT to https://crosscheck-demo.onrender.com/mcp/ with fresh authorization.
+- [ ] Separate hosted restart check skipped at user request to wrap within five minutes. PostgreSQL reconnect persistence, stable environment key and hosted retained connection already verified.
