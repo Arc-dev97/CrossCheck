@@ -1,0 +1,22 @@
+# Free demo deployment. App state is stored in Supabase; no paid disk.
+# Set APP_BASE_URL and PUBLIC_BASE_URL to the assigned HTTPS service URL.
+services:
+  - type: web
+    name: crosscheck
+    runtime: python
+    plan: free
+    region: singapore
+    numInstances: 1
+    buildCommand: pip install -r requirements.lock.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips '*'
+    healthCheckPath: /api/auth/me
+    autoDeployTrigger: "off"
+    envVars:
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: CROSSCHECK_DATABASE_URL
+        sync: false
+      - key: APP_SECRET_KEY
+        sync: false

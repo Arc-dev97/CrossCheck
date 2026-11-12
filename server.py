@@ -12,28 +12,35 @@ from app.engine import read_csv, profile, reconcile
 from app.auth import require_owner, owner_context, install_auth
 
 ROOT=Path(__file__).parent
+from dotenv import load_dotenv
+load_dotenv(ROOT/'.env')
+from app import storage
 DATA=ROOT/'data'; DATA.mkdir(exist_ok=True)
-DB=DATA/'workspace.sqlite3'
-with closing(sqlite3.connect(DB)) as db, db:
-    db.execute('CREATE TABLE IF NOT EXISTS records (id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL, owner TEXT)')
-    if 'owner' not in [r[1] for r in db.execute('PRAGMA table_info(records)')]:db.execute('ALTER TABLE records ADD COLUMN owner TEXT')
+if os.getenv('RENDER_EXTERNAL_URL') and not os.getenv('CROSSCHECK_DATABASE_URL'):raise RuntimeError('Hosted service requires durable CROSSCHECK_DATABASE_URL.')
+DB=os.getenv('CROSSCHECK_DATABASE_URL') or DATA/'workspace.sqlite3'
+if storage.is_postgres(DB) and len(os.getenv('APP_SECRET_KEY',''))<32:raise RuntimeError('Hosted state requires APP_SECRET_KEY with at least 32 characters.')
+storage.initialize(DB)
 
 def save(kind, payload):
     owner=require_owner()
     obj={**payload,'id':uuid.uuid4().hex,'created_at':datetime.now(timezone.utc).isoformat()}
-    with closing(sqlite3.connect(DB)) as db, db: db.execute('INSERT INTO records (id,kind,payload,owner) VALUES (?,?,?,?)',(obj['id'],kind,json.dumps(obj),owner))
+    with closing(storage.connect(DB)) as db, db: db.execute('INSERT INTO records (id,kind,payload,owner) VALUES (?,?,?,?)',(obj['id'],kind,json.dumps(obj),owner))
     return obj
 
 def get(kind, id):
     owner=require_owner()
-    with closing(sqlite3.connect(DB)) as db, db: row=db.execute('SELECT payload FROM records WHERE id=? AND kind=? AND owner=?',(id,kind,owner)).fetchone()
+    with closing(storage.connect(DB)) as db, db: row=db.execute('SELECT payload FROM records WHERE id=? AND kind=? AND owner=?',(id,kind,owner)).fetchone()
     if not row: raise HTTPException(404,f'{kind.title()} not found.')
     return json.loads(row[0])
 
-def listing(kind):
-    owner=require_owner()
-    with closing(sqlite3.connect(DB)) as db, db: rows=db.execute('SELECT payload FROM records WHERE kind=? AND owner=? ORDER BY rowid DESC',(kind,owner)).fetchall()
-    return [json.loads(r[0]) for r in rows]
+def listing(kind,compact=False):
+    owner=require_owner();expression='payload'
+    if compact:
+        if kind=='dataset':expression="payload::jsonb - 'text' - 'data'" if storage.is_postgres(DB) else "json_remove(payload,'$.text','$.data')"
+        elif kind=='run':expression="jsonb_set(payload::jsonb,'{result}',jsonb_build_object('summary',payload::jsonb->'result'->'summary'))" if storage.is_postgres(DB) else "json_set(payload,'$.result',json_object('summary',json_extract(payload,'$.result.summary')))"
+        else:raise ValueError('Unsupported summary projection.')
+    with closing(storage.connect(DB)) as db:rows=db.execute('SELECT '+expression+' FROM records WHERE kind=? AND owner=? ORDER BY rowid DESC',(kind,owner)).fetchall()
+    return [r[0] if isinstance(r[0],dict) else json.loads(r[0]) for r in rows]
 
 from app.models import *
 from app.sources import snapshot_data, install_sources
@@ -100,24 +107,25 @@ def preview(p:PreviewInput):
 @app.post('/api/runs')
 def execute(p:ExecuteInput):
     preview=get('preview',p.preview_id)
-    # Reuse an existing immutable run when a user double-clicks Execute.
-    for run in listing('run'):
-        if run['preview_id']==p.preview_id: return run
+    # Match only this preview instead of fetching every full historical report.
+    expression="payload::jsonb->>'preview_id'" if storage.is_postgres(DB) else "json_extract(payload,'$.preview_id')"
+    with closing(storage.connect(DB)) as db:existing=db.execute("SELECT payload FROM records WHERE kind='run' AND owner=? AND "+expression+"=? ORDER BY rowid DESC LIMIT 1",(require_owner(),p.preview_id)).fetchone()
+    if existing:return json.loads(existing[0])
     name=p.name.strip() or (Path(get('dataset',preview['left_id'])['name']).stem+' vs '+Path(get('dataset',preview['right_id'])['name']).stem).replace('_',' ')
     return save('run',{k:v for k,v in preview.items() if k not in ('id','created_at')} | {'preview_id':p.preview_id,'name':name})
 def legacy_run_name(r):
     return (Path(get('dataset',r['left_id'])['name']).stem+' vs '+Path(get('dataset',r['right_id'])['name']).stem).replace('_',' ')
 
 @app.get('/api/runs')
-def runs(): return [{k:r[k] for k in ('id','created_at','left_id','right_id')}|{'summary':r['result']['summary'],'name':r.get('name',legacy_run_name(r))} for r in listing('run')]
+def runs(): return [{k:r[k] for k in ('id','created_at','left_id','right_id')}|{'summary':r['result']['summary'],'name':(r.get('name') or legacy_run_name(r))} for r in listing('run',compact=True)]
 @app.get('/api/runs/{id}')
 def run(id:str):
     r=get('run',id)
-    return r | {'name':r.get('name',legacy_run_name(r))}
+    return r | {'name':(r.get('name') or legacy_run_name(r))}
 @app.get('/api/runs/{id}/export')
 def export(id:str):
     saved_run=get('run',id)
-    label=saved_run.get('name',legacy_run_name(saved_run))
+    label=(saved_run.get('name') or legacy_run_name(saved_run))
     filename=(re.sub(r'[^a-zA-Z0-9]+','-',label).strip('-')[:100] or 'reconciliation')+'-'+saved_run['created_at'][:10]+'.csv'
     result=saved_run['result']; output=io.StringIO(newline='');w=csv.writer(output)
     def safe(v):

@@ -80,7 +80,7 @@ def rows_data(columns,rows,primary_key):
 class SourceManager:
     def __init__(self,b):
         self.b=b
-        self.cipher=Fernet(base64.urlsafe_b64encode(hashlib.sha256((b.DATA/'session-signing.key').read_bytes()).digest()))
+        self.cipher=Fernet(base64.urlsafe_b64encode(hashlib.sha256(b.secret_material).digest()))
         self.connect=psycopg.connect
     def encrypt(self,value):return self.cipher.encrypt(json.dumps(value).encode()).decode()
     def decrypt(self,value):return json.loads(self.cipher.decrypt(value.encode()))

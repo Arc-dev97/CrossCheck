@@ -19,7 +19,7 @@ def install_mcp(app, backend):
     @mcp.tool(annotations=readonly)
     def list_datasets() -> dict:
         """List saved CSV datasets and database snapshots, with IDs, names and row counts. Use this before selecting inputs."""
-        return {'datasets':[{'id':d['id'],'name':d['name'],'rows':d['profile']['rows'],'created_at':d['created_at']} for d in backend.listing('dataset')][:100]}
+        return {'datasets':[{'id':d['id'],'name':d['name'],'rows':d['profile']['rows'],'created_at':d['created_at']} for d in backend.listing('dataset',compact=True)][:100]}
 
     @mcp.tool(annotations=readonly)
     def inspect_dataset(dataset_id:str, sample_rows:int=5) -> dict:

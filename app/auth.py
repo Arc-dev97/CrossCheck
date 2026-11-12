@@ -17,30 +17,35 @@ def require_owner():
 
 def install_auth(app,b):
     load_dotenv(b.ROOT/'.env')
-    base=os.getenv('APP_BASE_URL','http://localhost:8000').rstrip('/')
+    base=(os.getenv('APP_BASE_URL') or os.getenv('RENDER_EXTERNAL_URL') or 'http://localhost:8000').rstrip('/')
     secure=base.startswith('https://')
     client_id=os.getenv('GOOGLE_CLIENT_ID','').strip();secret=os.getenv('GOOGLE_CLIENT_SECRET','').strip()
     configured=bool(client_id and secret)
     key_path=b.DATA/'session-signing.key'
-    if not key_path.exists(): key_path.write_text(secrets.token_urlsafe(48))
-    app.add_middleware(SessionMiddleware,secret_key=key_path.read_text().strip(),session_cookie='oidc_flow',max_age=600,same_site='lax',https_only=secure)
-    with closing(b.sqlite3.connect(b.DB)) as db,db:
+    material=os.getenv('APP_SECRET_KEY','')
+    if material and len(material)<32:raise RuntimeError('APP_SECRET_KEY must have at least 32 characters.')
+    if not material:
+        if not key_path.exists():key_path.write_text(secrets.token_urlsafe(48))
+        material=key_path.read_text().strip()
+    b.secret_material=material.encode()
+    app.add_middleware(SessionMiddleware,secret_key=material,session_cookie='oidc_flow',max_age=600,same_site='lax',https_only=secure)
+    with closing(b.storage.connect(b.DB)) as db,db:
         db.execute('CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT NOT NULL, name TEXT NOT NULL)')
-        db.execute('CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires REAL NOT NULL)')
+        db.execute('CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires DOUBLE PRECISION NOT NULL)')
     oauth=OAuth()
     if configured:oauth.register(name='google',client_id=client_id,client_secret=secret,server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',client_kwargs={'scope':'openid email profile','code_challenge_method':'S256'})
     b.oauth=oauth;b.auth_configured=configured;b.base_url=base
-    b.public_base_url=os.getenv('PUBLIC_BASE_URL',base).rstrip('/')
+    b.public_base_url=(os.getenv('PUBLIC_BASE_URL') or base).rstrip('/')
     def issue_session(user):
         token=secrets.token_urlsafe(40)
-        with closing(b.sqlite3.connect(b.DB)) as db,db:
-            db.execute('INSERT OR REPLACE INTO users VALUES (?,?,?)',(user['id'],user['email'],user['name']))
+        with closing(b.storage.connect(b.DB)) as db,db:
+            db.execute('INSERT INTO users(id,email,name) VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET email=excluded.email,name=excluded.name',(user['id'],user['email'],user['name']))
             db.execute('INSERT INTO sessions VALUES (?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),user['id'],time.time()+7*86400))
         return token
     b.issue_session=issue_session
     def resolve_session(token):
         if not token:return None
-        with closing(b.sqlite3.connect(b.DB)) as db:
+        with closing(b.storage.connect(b.DB)) as db:
             row=db.execute('SELECT users.id,users.email,users.name FROM sessions JOIN users ON users.id=sessions.user_id WHERE token_hash=? AND expires>?',(hashlib.sha256(token.encode()).hexdigest(),time.time())).fetchone()
         return dict(zip(('id','email','name'),row)) if row else None
     b.resolve_session=resolve_session
@@ -101,5 +106,5 @@ def install_auth(app,b):
         origin=request.headers.get('origin')
         if origin and origin not in (base,b.public_base_url):raise HTTPException(403,'Invalid origin')
         token=request.cookies.get('reconcile_session','')
-        with closing(b.sqlite3.connect(b.DB)) as db,db:db.execute('DELETE FROM sessions WHERE token_hash=?',(hashlib.sha256(token.encode()).hexdigest(),))
+        with closing(b.storage.connect(b.DB)) as db,db:db.execute('DELETE FROM sessions WHERE token_hash=?',(hashlib.sha256(token.encode()).hexdigest(),))
         response=RedirectResponse('/',status_code=303);response.delete_cookie('reconcile_session');return response

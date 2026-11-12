@@ -16,17 +16,17 @@ def digest(value):return hashlib.sha256(value.encode()).hexdigest()
 class Provider:
     def __init__(self,b):self.b=b
     def init_db(self):
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db,db:
+        with closing(self.b.storage.connect(self.b.DB)) as db,db:
             db.execute('CREATE TABLE IF NOT EXISTS oauth_store (kind TEXT,key TEXT,payload TEXT,PRIMARY KEY(kind,key))')
     def put(self,kind,key,value):
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db,db:db.execute('INSERT OR REPLACE INTO oauth_store VALUES (?,?,?)',(kind,key,json.dumps(value)))
+        with closing(self.b.storage.connect(self.b.DB)) as db,db:db.execute('INSERT INTO oauth_store(kind,key,payload) VALUES (?,?,?) ON CONFLICT(kind,key) DO UPDATE SET payload=excluded.payload',(kind,key,json.dumps(value)))
     def read(self,kind,key):
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db:
+        with closing(self.b.storage.connect(self.b.DB)) as db:
             row=db.execute('SELECT payload FROM oauth_store WHERE kind=? AND key=?',(kind,key)).fetchone()
         return json.loads(row[0]) if row else None
     def consume(self,kind,key):
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db,db:
-            db.execute('BEGIN IMMEDIATE');row=db.execute('SELECT payload FROM oauth_store WHERE kind=? AND key=?',(kind,key)).fetchone()
+        with closing(self.b.storage.connect(self.b.DB)) as db,db:
+            self.b.storage.begin_write(db);row=db.execute('SELECT payload FROM oauth_store WHERE kind=? AND key=?',(kind,key)).fetchone()
             if row:db.execute('DELETE FROM oauth_store WHERE kind=? AND key=?',(kind,key))
         return json.loads(row[0]) if row else None
     async def get_client(self,id):
@@ -73,7 +73,7 @@ class Provider:
         data=self.read('access',digest(token))
         if not data or data['expires_at']<=time.time() or self.read('revoked',data['family']):return None
         if data['resource'].rstrip('/')!=(self.b.public_base_url+'/mcp/').rstrip('/'):return None
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db:
+        with closing(self.b.storage.connect(self.b.DB)) as db:
             if not db.execute('SELECT id FROM users WHERE id=?',(data['subject'],)).fetchone():return None
         return AccessToken(token=token,claims={'grant_family':data['family']},**{k:v for k,v in data.items() if k!='family'})
     async def revoke_token(self,token):

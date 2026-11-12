@@ -36,7 +36,7 @@ def build_info(root):
     h=hashlib.sha256()
     for p in sorted([root/'server.py',*[p for p in (root/'app').iterdir() if p.suffix in ('.py','.js','.html')]]):
         h.update(p.relative_to(root).as_posix().encode());h.update(p.read_bytes())
-    commit=os.environ.get('RECONCILE_BUILD_COMMIT','')
+    commit=os.environ.get('RECONCILE_BUILD_COMMIT') or os.environ.get('RENDER_GIT_COMMIT','')
     return {'application_commit':commit if re.fullmatch(r'[0-9a-fA-F]{40}',commit) else None,'application_fingerprint':h.hexdigest(),'commit_note':'Set RECONCILE_BUILD_COMMIT only to the deployed commit. A configured branch alone is not deployment proof.'}
 
 class RepositoryManager:

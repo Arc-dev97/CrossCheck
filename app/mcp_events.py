@@ -47,12 +47,12 @@ def send_webhook(url,secret,event_id,body,subscription_id,old_secret=None):
 class EventHub:
     def __init__(self,b):
         self.b=b;self.store=b.mcp_oauth;self.send=send_webhook
-        material=(b.DATA/'session-signing.key').read_bytes()
+        material=b.secret_material
         self.cipher=Fernet(base64.urlsafe_b64encode(hashlib.sha256(material).digest()))
     def protect(self,s):return self.cipher.encrypt(s.encode()).decode()
     def unprotect(self,s):return self.cipher.decrypt(s.encode()).decode()
     def all(self,kind):
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db:rows=db.execute('SELECT payload FROM oauth_store WHERE kind=?',(kind,)).fetchall()
+        with closing(self.b.storage.connect(self.b.DB)) as db:rows=db.execute('SELECT payload FROM oauth_store WHERE kind=?',(kind,)).fetchall()
         return [json.loads(r[0]) for r in rows]
     def catalog(self):return {'events':[{'name':EVENT,'description':'A scheduled reconciliation completed, completed with discrepancies, or failed. Use read tools to inspect evidence.','delivery':['webhook'],'inputSchema':{'type':'object','properties':{'job_id':{'type':'string'},'statuses':{'type':'array','items':{'enum':['completed','completed_with_discrepancies','failed']}}},'additionalProperties':False},'payloadSchema':{'type':'object','properties':{'job_id':{'type':'string'},'job_name':{'type':'string'},'status':{'type':'string'},'run_id':{'type':['string','null']},'summary':{'type':'object'},'error':{'type':['string','null']},'url':{'type':'string'}},'required':['job_id','job_name','status','run_id','summary','error','url'],'additionalProperties':False}}]}
     def filters(self,args):
@@ -97,13 +97,13 @@ class EventHub:
         return {}
     def active(self,sub):
         if not sub['active'] or sub['expires']<=time.time() or self.store.read('revoked',sub['family']):return False
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db:return bool(db.execute('SELECT id FROM users WHERE id=?',(sub['owner'],)).fetchone())
+        with closing(self.b.storage.connect(self.b.DB)) as db:return bool(db.execute('SELECT id FROM users WHERE id=?',(sub['owner'],)).fetchone())
     def public_subscriptions(self):
         owner=require_owner()
         return [{k:s[k] for k in ('id','name','arguments','expires','updated_at')}|{'active':self.active(s)} for s in self.all('subscription') if s['owner']==owner]
     def update_event(self,event,changes):
         event={**event,**changes}
-        with closing(self.b.sqlite3.connect(self.b.DB)) as db,db:db.execute("UPDATE records SET payload=? WHERE id=? AND owner=? AND kind='event'",(json.dumps(event),event['id'],require_owner()))
+        with closing(self.b.storage.connect(self.b.DB)) as db,db:db.execute("UPDATE records SET payload=? WHERE id=? AND owner=? AND kind='event'",(json.dumps(event),event['id'],require_owner()))
     def deliver_pending(self):
         subs=[s for s in self.all('subscription') if self.active(s)]
         attempted=0

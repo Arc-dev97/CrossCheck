@@ -35,8 +35,8 @@ def compare_runs(previous,current):
 def install_scheduler(app,b):
     def replace(id,changes):
         owner=require_owner()
-        with closing(b.sqlite3.connect(b.DB,timeout=10)) as db,db:
-            db.execute('BEGIN IMMEDIATE')
+        with closing(b.storage.connect(b.DB,timeout=10)) as db,db:
+            b.storage.begin_write(db)
             row=db.execute("SELECT payload FROM records WHERE kind='job' AND id=? AND owner=?",(id,owner)).fetchone()
             if not row:raise HTTPException(404,'Job not found.')
             job=json.loads(row[0]);job.update(changes)
@@ -53,8 +53,8 @@ def install_scheduler(app,b):
         if not p.name.strip():raise ValueError('Enter a job name.')
     def claim(id,manual=False):
         owner=require_owner();now=time.time()
-        with closing(b.sqlite3.connect(b.DB,timeout=10)) as db,db:
-            db.execute('BEGIN IMMEDIATE')
+        with closing(b.storage.connect(b.DB,timeout=10)) as db,db:
+            b.storage.begin_write(db)
             row=db.execute("SELECT payload FROM records WHERE kind='job' AND id=? AND owner=?",(id,owner)).fetchone()
             if not row:raise HTTPException(404,'Job not found.')
             job=json.loads(row[0])
@@ -85,7 +85,7 @@ def install_scheduler(app,b):
             comparable=previous and previous.get('source_selection')==selection and previous.get('recipe')==validated.model_dump(mode='json') and previous.get('source_mode','files')==job.get('source_mode','files')
             changes=compare_runs(previous['result'] if comparable else None,p)
             metadata={'job_id':id,'source_selection':selection,'source_mode':job.get('source_mode','files'),'sources':provenance,'code_context':contexts,'build':build,'changes':changes}
-            with closing(b.sqlite3.connect(b.DB)) as db,db:
+            with closing(b.storage.connect(b.DB)) as db,db:
                 preview=b.get('preview',p['preview_id']);preview.update(metadata)
                 db.execute("UPDATE records SET payload=? WHERE id=? AND owner=?",(json.dumps(preview),preview['id'],require_owner()))
             run=b.execute(ExecuteInput(preview_id=p['preview_id'],name=job['name']))
@@ -120,7 +120,7 @@ def install_scheduler(app,b):
                 await asyncio.sleep(1)
         def tick(self,now=None):
             now=time.time() if now is None else now
-            with closing(b.sqlite3.connect(b.DB)) as db:rows=db.execute("SELECT owner,payload FROM records WHERE kind='job' AND owner IS NOT NULL").fetchall()
+            with closing(b.storage.connect(b.DB)) as db:rows=db.execute("SELECT owner,payload FROM records WHERE kind='job' AND owner IS NOT NULL").fetchall()
             for owner,text in rows:
                 job=json.loads(text)
                 if not job['enabled'] or job.get('lease_until',0)>now or job['next_run_at']>now:continue
@@ -134,7 +134,7 @@ def install_scheduler(app,b):
         def run(self,id):return perform(id,True)
     scheduler=Scheduler()
     @app.get('/api/datasets')
-    def datasets():return [{'id':d['id'],'name':d['name'],'created_at':d['created_at'],'rows':d['profile']['rows'],'kind':'database_snapshot' if 'provenance' in d else 'csv'} for d in b.listing('dataset')]
+    def datasets():return [{'id':d['id'],'name':d['name'],'created_at':d['created_at'],'rows':d['profile']['rows'],'kind':'database_snapshot' if 'provenance' in d else 'csv'} for d in b.listing('dataset',compact=True)]
     @app.get('/api/jobs')
     def jobs():return b.listing('job')
     @app.post('/api/jobs')
@@ -157,8 +157,8 @@ def install_scheduler(app,b):
     @app.get('/api/notifications')
     def notifications(page:int=Query(1,ge=1),page_size:int=Query(5,ge=1,le=50)):
         owner=require_owner()
-        with closing(b.sqlite3.connect(b.DB)) as db:
-            db.execute('BEGIN')
+        with closing(b.storage.connect(b.DB)) as db:
+            b.storage.begin_read(db)
             total=db.execute("SELECT count(*) FROM records WHERE kind='event' AND owner=?",(owner,)).fetchone()[0]
             pages=max(1,(total+page_size-1)//page_size);page=min(page,pages)
             rows=db.execute("SELECT payload FROM records WHERE kind='event' AND owner=? ORDER BY rowid DESC LIMIT ? OFFSET ?",(owner,page_size,(page-1)*page_size)).fetchall()

@@ -10,7 +10,7 @@ Install with `python -m venv .venv` then `.\.venv\Scripts\python.exe -m pip inst
 
 ## Architecture
 
-FastAPI + Authlib Google OpenID Connect + opaque server sessions + owner-scoped SQLite storage. Python CSV/dictionary/Decimal reconciliation remains deterministic. No DuckDB or AI inference is required. Preserved source rows, reusable recipe versions, immutable previews and runs, CSV exports, and assistant draft review are implemented.
+FastAPI + Authlib Google OpenID Connect + opaque server sessions + owner-scoped storage: SQLite locally or durable Supabase PostgreSQL on the free hosted service. Python CSV/dictionary/Decimal reconciliation remains deterministic. No DuckDB or AI inference is required. Preserved source rows, reusable recipe versions, immutable previews and runs, CSV exports, and assistant draft review are implemented.
 
 ## Scheduling
 
@@ -43,3 +43,7 @@ Use the account menu → Reset demo data to review and clear only your generated
 GitHub setup controls and job repository selectors are removed from the UI. For the demo, use CrossCheck MCP for run evidence and the assistant's independent GitHub connector for code review, supplying the repository/branch explicitly. That separate connector must be enabled in the assistant session. Existing backend repository tools remain compatible with previously connected clients.
 
 See UI_UX_IMPLEMENTATION_PLAN.md for the checked implementation and validation record.
+
+## Free hosted demo
+
+See DEPLOYMENT.md and render.yaml. The hosted app stores state in Supabase and reads a stable signing/encryption key from private environment configuration. Existing local source data and SQLite remain available. Free hosting sleeps when idle, so schedules operate while the service is awake. Do not use a paid plan or disk for this deployment.

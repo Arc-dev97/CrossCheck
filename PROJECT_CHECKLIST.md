@@ -195,3 +195,14 @@ Validation limits: browser download-event automation timed out (export endpoint 
 - [x] Manual rule edits clear saved selection and invalidate preview approval.
 - [x] Incompatible recipes leave existing rules unchanged and show Recipe not applied.
 - [x] Browser verified with actual employee-audit snapshots: correct business keys, Number comparison, 71 matches / 12 mismatches; edited rules and incompatible recipe states verified. JavaScript syntax checks pass; no backend changes.
+
+## Free hosted deployment
+- [x] Durable PostgreSQL state adapter, local SQLite preserved, stable environment-based encryption/signing key.
+- [x] Separate app-state role and schemas, no source-table writes, RLS/public-access restrictions.
+- [x] Consistent local backup and verified bulk copy of 1,311 records; cloud schedules paused and old OAuth sessions not migrated.
+- [x] Local regression: 43 tests pass. PostgreSQL API/auth/persistence/export/validation scenarios pass; final reset/undo, compact listings and overlapping-job checks pass.
+- [x] History/source/reset-summary queries measured against migrated data at approximately 2–4 seconds from the local machine.
+- [x] Linux dependency marker and Python version pin; Render Free configuration, no paid disk.
+- [ ] Render deployment and real Google sign-in at the new URL.
+- [ ] Public MCP verification and fresh ChatGPT authorization at the new URL.
+- [ ] Hosted restart and retained connection/state check.
